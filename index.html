@@ -5,644 +5,745 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Waiheke High School: AS92027 History Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        whs: { dark: '#002066', gold: '#c5a059', light: '#d1e6f6', goldtext: '#8b6508' }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap');
         
-        :root { --whs-dark-blue: #002066; --whs-gold: #c5a059; --whs-light-blue: #d1e6f6; --whs-accent: #e2e8f0; }
-        body { font-family: 'Manrope', sans-serif; background-color: var(--whs-accent); color: #1e293b; line-height: 1.6; }
+        body { font-family: 'Manrope', sans-serif; transition: background-color 0.3s, color 0.3s; }
         .font-mono { font-family: 'JetBrains Mono', monospace; }
-        .whs-gradient-bg { background: var(--whs-dark-blue); }
-        .glass-card { background: white; border: 1px solid var(--whs-light-blue); border-radius: 0.5rem; box-shadow: 0 1px 3px 0 rgba(0,0,0,0.1), 0 1px 2px 0 rgba(0,0,0,0.06); }
-        .nav-btn { padding: 0.75rem 1rem; color: #64748b; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; font-size: 0.875rem;}
-        .nav-btn:hover { color: var(--whs-dark-blue); }
-        .nav-active { border-bottom-color: var(--whs-dark-blue); color: var(--whs-dark-blue); font-weight: 800; }
         
-        .stage-header { font-size: 1.125rem; font-weight: 800; color: var(--whs-dark-blue); text-transform: uppercase; letter-spacing: 0.05em; display: flex; align-items: center; gap: 0.5rem; }
-        .stage-number-badge { background-color: var(--whs-dark-blue); color: white; border-radius: 9999px; width: 1.75rem; height: 1.75rem; display: inline-flex; align-items: center; justify-content: center; font-size: 0.875rem; }
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 3px; }
+        .custom-scrollbar:hover::-webkit-scrollbar-thumb { background: rgba(107, 114, 128, 0.8); }
 
+        /* Animations */
         @keyframes globe-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes star-pulse { 0%, 100% { transform: scale(0.85); filter: drop-shadow(0 0 5px rgba(197,160,89,0.5)); opacity: 0.9; } 50% { transform: scale(1.1); filter: drop-shadow(0 0 15px rgba(253,224,71,0.9)); opacity: 1; } }
 
-        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 3px; }
-        .custom-scrollbar:hover::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.4); }
-
-        .evidence-box { padding: 1rem; border-radius: 0.5rem; border: 1px solid #cbd5e1; background: #f8fafc; transition: all 0.2s; }
-        .evidence-box:hover { border-color: var(--whs-gold); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        /* Component Styles */
+        .glass-card { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); transition: background-color 0.3s, border-color 0.3s; }
         
-        .quiz-option { border: 2px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; cursor: pointer; transition: all 0.2s; font-weight: 600; }
-        .quiz-option:hover { background-color: #f1f5f9; border-color: #cbd5e1; }
-        .quiz-option.correct { background-color: #d1fae5; border-color: #10b981; color: #047857; }
-        .quiz-option.incorrect { background-color: #fee2e2; border-color: #ef4444; color: #b91c1c; }
-        .quiz-option.disabled { pointer-events: none; opacity: 0.6; }
+        .nav-btn { padding: 0.75rem 1rem; font-weight: 600; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; font-size: 0.875rem;}
+        .nav-active { border-bottom-color: #002066; color: #002066; font-weight: 800; }
+        .dark .nav-active { border-bottom-color: #60a5fa; color: #60a5fa; }
+        
+        .evidence-box { padding: 1rem; border-radius: 0.5rem; border: 1px solid #cbd5e1; transition: all 0.2s; }
+        .evidence-box:hover { border-color: #c5a059; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .dark .evidence-box { border-color: #334155; background-color: #1e293b; }
+        .dark .evidence-box:hover { border-color: #c5a059; }
 
-        /* Flashcard Flip CSS */
+        .timeline-btn { padding: 0.5rem 1.5rem; border-radius: 9999px; font-weight: 700; font-size: 0.875rem; white-space: nowrap; transition: all 0.2s; background: #e2e8f0; color: #475569; }
+        .dark .timeline-btn { background: #334155; color: #cbd5e1; }
+        .timeline-btn.active { background: #002066; color: white; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); }
+        .dark .timeline-btn.active { background: #3b82f6; color: white; }
+        
+        /* Flashcards */
         .flip-card { background-color: transparent; perspective: 1000px; cursor: pointer; }
         .flip-card-inner { position: relative; width: 100%; height: 100%; text-align: center; transition: transform 0.6s; transform-style: preserve-3d; }
         .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
         .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; display: flex; align-items: center; justify-content: center; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
-        .flip-card-front { background-color: white; border: 2px solid var(--whs-dark-blue); color: var(--whs-dark-blue); }
-        .flip-card-back { background-color: var(--whs-dark-blue); color: white; transform: rotateY(180deg); border: 2px solid var(--whs-dark-blue); }
-
-        .question-btn { border: 2px solid transparent; transition: all 0.2s; }
-        .question-btn.active { border-color: var(--whs-gold); background-color: #fefce8; color: #854d0e; }
+        .flip-card-back { transform: rotateY(180deg); }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-200">
 
-    <div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto p-4 md:p-8">
+        
         <!-- HEADER -->
-        <header class="whs-gradient-bg rounded-lg p-8 md:p-12 text-white mb-8 shadow-md relative overflow-hidden flex justify-between items-center">
-            <div class="relative z-10">
-                <div class="flex flex-col md:flex-row items-start md:items-center gap-6 mb-3">
-                    <div class="relative flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#10b981]/20 to-white/10 backdrop-blur-md rounded-2xl shadow-lg border border-white/30 shrink-0 group overflow-hidden">
-                        <div class="absolute inset-0 bg-[#c5a059] blur-[20px] opacity-20 group-hover:opacity-40 transition duration-700"></div>
-                        <div class="relative z-10 flex items-center justify-center">
-                            <svg class="w-12 h-12 md:w-14 md:h-14 drop-shadow-xl" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <g style="transform-origin: center; animation: globe-spin 25s linear infinite;">
-                                    <circle cx="50" cy="50" r="46" fill="#1e3a8a" />
-                                    <path d="M 50 4 A 46 46 0 0 1 96 50 A 46 46 0 0 1 80 84 Q 70 60 50 60 Q 30 60 15 78 A 46 46 0 0 1 4 50 A 46 46 0 0 1 50 4 Z" fill="#10b981" opacity="0.8"/>
-                                    <path d="M 20 20 Q 40 40 60 30 T 90 40 A 46 46 0 0 0 50 4 A 46 46 0 0 0 20 20 Z" fill="#34d399" opacity="0.7"/>
-                                    <ellipse cx="50" cy="50" rx="20" ry="46" stroke="#60a5fa" stroke-width="1.5" opacity="0.5"/>
-                                    <ellipse cx="50" cy="50" rx="46" ry="20" stroke="#60a5fa" stroke-width="1.5" opacity="0.5"/>
-                                    <circle cx="50" cy="50" r="46" stroke="#93c5fd" stroke-width="2" opacity="0.6"/>
-                                </g>
-                                <g style="transform-origin: center; animation: star-pulse 3.5s ease-in-out infinite;">
-                                    <path d="M50 8 L55 45 L92 50 L55 55 L50 92 L45 55 L8 50 L45 45 Z" fill="#c5a059" />
-                                    <path d="M50 20 L53 47 L80 50 L53 53 L50 80 L47 53 L20 50 L47 47 Z" fill="#fde047" />
-                                    <circle cx="50" cy="50" r="5" fill="#fff" />
-                                    <circle cx="50" cy="8" r="2.5" fill="#fff" />
-                                    <circle cx="92" cy="50" r="2.5" fill="#fff" />
-                                    <circle cx="50" cy="92" r="2.5" fill="#fff" />
-                                    <circle cx="8" cy="50" r="2.5" fill="#fff" />
-                                </g>
-                            </svg>
-                        </div>
-                    </div>
-                    <div>
-                        <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-1">Waiheke High School</h1>
-                        <h2 class="text-xl md:text-2xl font-normal opacity-90">NCEA Level 1 History (AS92027) Dashboard</h2>
-                        <div class="mt-3 inline-block bg-white text-[#002066] px-4 py-1.5 border border-transparent text-xs font-bold uppercase tracking-widest shadow-sm rounded">The Occupation of Japan</div>
+        <header class="bg-whs-dark rounded-lg p-6 md:p-10 text-white mb-6 shadow-lg relative overflow-hidden flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="relative z-10 flex flex-col md:flex-row items-center gap-6 text-center md:text-left w-full">
+                <div class="relative flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#10b981]/20 to-white/10 backdrop-blur-md rounded-2xl shadow-lg border border-white/30 shrink-0 group overflow-hidden">
+                    <div class="absolute inset-0 bg-[#c5a059] blur-[20px] opacity-20 group-hover:opacity-40 transition duration-700"></div>
+                    <div class="relative z-10 flex items-center justify-center">
+                        <svg class="w-12 h-12 md:w-14 md:h-14 drop-shadow-xl" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <g style="transform-origin: center; animation: globe-spin 25s linear infinite;">
+                                <circle cx="50" cy="50" r="46" fill="#1e3a8a" />
+                                <path d="M 50 4 A 46 46 0 0 1 96 50 A 46 46 0 0 1 80 84 Q 70 60 50 60 Q 30 60 15 78 A 46 46 0 0 1 4 50 A 46 46 0 0 1 50 4 Z" fill="#10b981" opacity="0.8"/>
+                                <path d="M 20 20 Q 40 40 60 30 T 90 40 A 46 46 0 0 0 50 4 A 46 46 0 0 0 20 20 Z" fill="#34d399" opacity="0.7"/>
+                                <ellipse cx="50" cy="50" rx="20" ry="46" stroke="#60a5fa" stroke-width="1.5" opacity="0.5"/>
+                                <ellipse cx="50" cy="50" rx="46" ry="20" stroke="#60a5fa" stroke-width="1.5" opacity="0.5"/>
+                                <circle cx="50" cy="50" r="46" stroke="#93c5fd" stroke-width="2" opacity="0.6"/>
+                            </g>
+                            <g style="transform-origin: center; animation: star-pulse 3.5s ease-in-out infinite;">
+                                <path d="M50 8 L55 45 L92 50 L55 55 L50 92 L45 55 L8 50 L45 45 Z" fill="#c5a059" />
+                                <path d="M50 20 L53 47 L80 50 L53 53 L50 80 L47 53 L20 50 L47 47 Z" fill="#fde047" />
+                                <circle cx="50" cy="50" r="5" fill="#fff" />
+                            </g>
+                        </svg>
                     </div>
                 </div>
+                <div class="flex-1">
+                    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-1">Waiheke High School</h1>
+                    <h2 class="text-xl md:text-2xl font-normal opacity-90">NCEA Level 1 History (AS92027) Dashboard</h2>
+                    <div class="mt-3 inline-block bg-white text-whs-dark px-4 py-1.5 border border-transparent text-xs font-bold uppercase tracking-widest shadow-sm rounded">The Occupation of Japan</div>
+                </div>
+                
+                <!-- Dark Mode Toggle -->
+                <button onclick="toggleDarkMode()" aria-label="Toggle Dark Mode" class="p-3 bg-white/10 hover:bg-white/20 rounded-full transition border border-white/20 backdrop-blur shrink-0">
+                    <!-- Sun Icon (shows in dark mode) -->
+                    <svg id="theme-sun" class="w-6 h-6 text-yellow-300 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <!-- Moon Icon (shows in light mode) -->
+                    <svg id="theme-moon" class="w-6 h-6 text-slate-200 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
             </div>
-            <svg class="absolute right-0 top-0 h-full w-64 text-white/5 transform translate-x-1/4 -translate-y-1/4 scale-150" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v4h-2zm0 6h2v2h-2zm-4-6h2v4H7zm0 6h2v2H7zm8-6h2v4h-2zm0 6h2v2h-2z" opacity="0.5"/><circle cx="12" cy="12" r="3" /><path d="M12 7l-3 4h6zM7 12l4 3v-6zM17 12l-4-3v6zM12 17l3-4H9z" opacity="0.8"/></svg>
+            <!-- Background Graphic -->
+            <svg class="absolute right-0 top-0 h-full w-64 text-white/5 transform translate-x-1/4 -translate-y-1/4 scale-150 pointer-events-none" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v4h-2zm0 6h2v2h-2zm-4-6h2v4H7zm0 6h2v2H7zm8-6h2v4h-2zm0 6h2v2h-2z" opacity="0.5"/><circle cx="12" cy="12" r="3" /><path d="M12 7l-3 4h6zM7 12l4 3v-6zM17 12l-4-3v6zM12 17l3-4H9z" opacity="0.8"/></svg>
         </header>
 
         <!-- NAVIGATION -->
-        <nav class="sticky top-0 z-50 bg-[#e2e8f0]/95 backdrop-blur-md flex items-center justify-center border-b-2 border-slate-300 mb-8 gap-1 md:gap-2 overflow-x-auto pb-3 pt-3 -mx-4 px-4 md:-mx-8 md:px-8 shadow-sm transition-all duration-300">
-            <button class="nav-btn nav-active" data-action="view" data-target="standard">The Standard</button>
-            <button class="nav-btn" data-action="view" data-target="perspectives">Perspectives</button>
-            <button class="nav-btn" data-action="view" data-target="vault">Evidence Vault</button>
-            <button class="nav-btn" data-action="view" data-target="blueprint">Essay Blueprint</button>
-            <button class="nav-btn text-[#c5a059]" data-action="view" data-target="feedback">Writing Sandbox</button>
-            <button class="nav-btn" data-action="view" data-target="exemplars">Exemplars</button>
-            <button class="nav-btn text-[#10b981]" data-action="view" data-target="practice">Practice Hub</button>
-            
-            <div class="flex items-center ml-2 md:ml-4 flex-shrink-0">
-                <a href="https://www.nzqa.govt.nz/ncea/assessment/search.do?query=History&view=exams&level=01&_gl=1*gpwrvu*_ga*MTU2NDA5MzUxMi4xNzczOTUxOTU0*_ga_TFQQ681L2E*czE3ODMxNTg3OTYkbzE1JGcxJHQxNzgzMTU4ODE3JGozOSRsMCRoMA.." target="_blank" class="px-4 py-2 bg-blue-50 text-[#002066] hover:bg-blue-100 border border-blue-200 rounded-lg font-bold text-sm transition flex items-center gap-2 shadow-sm">NZQA Guide ↗</a>
-            </div>
+        <nav class="sticky top-0 z-50 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md flex items-center justify-start md:justify-center border-b-2 border-slate-300 dark:border-slate-700 mb-8 gap-1 md:gap-4 overflow-x-auto pb-3 pt-3 -mx-4 px-4 md:-mx-0 md:px-0 shadow-sm transition-all duration-300 custom-scrollbar">
+            <button class="nav-btn nav-active text-slate-600 dark:text-slate-400" data-action="view" data-target="standard">The Standard</button>
+            <button class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="perspectives">Perspectives</button>
+            <button class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="sources">Primary Sources</button>
+            <button class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="vault">Evidence Vault</button>
+            <button class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="blueprint">Blueprint</button>
+            <button class="nav-btn text-whs-goldtext font-bold" data-action="view" data-target="feedback">Sandbox</button>
+            <button class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="exemplars">Exemplars</button>
+            <button class="nav-btn text-emerald-600 dark:text-emerald-400 font-bold" data-action="view" data-target="practice">Practice Hub</button>
         </nav>
 
-        <!-- VIEW 1: THE STANDARD -->
-        <div id="view-standard" class="space-y-8 animate-in fade-in duration-500 block">
-            <div class="text-center max-w-3xl mx-auto mb-8">
-                <h2 class="text-4xl font-black text-slate-900 mb-4">Know Your Target</h2>
-                <p class="text-slate-600">Understand exactly what the examiners (and the Chief Marker) are looking for.</p>
-            </div>
-
-            <div class="glass-card p-6 md:p-10 border-t-4 border-t-[#002066] max-w-5xl mx-auto bg-white">
-                <div class="mb-8 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                    <h4 class="text-sm font-black text-[#002066] uppercase tracking-widest mb-2 flex items-center gap-2">
-                        <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
-                        NZQA Chief Marker Advice
-                    </h4>
-                    <p class="text-sm text-slate-700 font-medium">Choosing a specific, well-defined historical context is crucial. Candidates should focus on the <strong>"why"</strong> (motivations and beliefs) rather than simply providing a chronological narrative of "what" happened. Discussing multiple, specific actions allows candidates to provide a much more detailed explanation of why individuals or groups responded the way they did.</p>
+        <!-- MAIN VIEWS -->
+        <main>
+            <!-- VIEW 1: THE STANDARD -->
+            <div id="view-standard" class="space-y-8 animate-in fade-in duration-500 block">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Know Your Target</h2>
+                    <p class="text-slate-600 dark:text-slate-400">Understand exactly what the examiners (and the Chief Marker) are looking for.</p>
                 </div>
 
-                <div class="space-y-6">
-                    <!-- Achieved Step -->
-                    <div class="flex flex-col md:flex-row gap-6 items-start border-b border-slate-200 pb-6">
-                        <div class="w-full md:w-1/4 pt-2">
-                            <span class="inline-block bg-emerald-100 text-emerald-800 font-black px-4 py-2 rounded-lg text-xl tracking-wide w-full text-center shadow-sm">ACHIEVED</span>
-                        </div>
-                        <div class="w-full md:w-3/4">
-                            <h3 class="text-xl font-bold text-slate-800 mb-2">Identify & Describe</h3>
-                            <p class="text-slate-600 mb-3 font-medium">Candidates successfully described two perspectives and their corresponding actions or responses using relevant historical evidence.</p>
-                            <ul class="space-y-2 text-sm text-slate-700 bg-slate-50 p-4 rounded-lg border border-slate-100">
-                                <li class="flex gap-2"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <strong>Identify:</strong> Name the perspective (e.g., The US Administration).</li>
-                                <li class="flex gap-2"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <strong>Describe Action:</strong> What did they actually do? (e.g., Dropped the atomic bombs).</li>
-                                <li class="flex gap-2"><svg class="w-5 h-5 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <strong>Provide Evidence:</strong> Include a basic fact or date.</li>
-                            </ul>
-                        </div>
+                <div class="glass-card p-6 md:p-10 bg-white dark:bg-slate-800 border-t-4 border-t-whs-dark dark:border-t-blue-500 rounded-xl max-w-5xl mx-auto">
+                    <!-- Chief Marker Note -->
+                    <div class="mb-8 p-5 bg-orange-50 dark:bg-slate-700/50 border border-orange-200 dark:border-slate-600 rounded-lg shadow-sm">
+                        <h4 class="text-sm font-black text-whs-dark dark:text-blue-300 uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+                            NZQA Chief Marker Advice
+                        </h4>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed">Choosing a specific, well-defined historical context is crucial. Candidates should focus on the <strong>"why"</strong> (motivations and beliefs) rather than simply providing a chronological narrative of "what" happened. Discussing multiple, specific actions allows candidates to provide a much more detailed explanation of why individuals or groups responded the way they did.</p>
                     </div>
 
-                    <!-- Merit Step -->
-                    <div class="flex flex-col md:flex-row gap-6 items-start border-b border-slate-200 pb-6">
-                        <div class="w-full md:w-1/4 pt-2">
-                            <span class="inline-block bg-blue-100 text-blue-800 font-black px-4 py-2 rounded-lg text-xl tracking-wide w-full text-center shadow-sm">MERIT</span>
-                        </div>
-                        <div class="w-full md:w-3/4">
-                            <h3 class="text-xl font-bold text-slate-800 mb-2">Explain & Compare</h3>
-                            <p class="text-slate-600 mb-3 font-medium">Candidates explained the perspectives and actions, detailed the differences between them, and supported this with relevant evidence.</p>
-                            <ul class="space-y-2 text-sm text-slate-700 bg-slate-50 p-4 rounded-lg border border-slate-100">
-                                <li class="flex gap-2"><svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <strong>Explain Motivations:</strong> Why did they take this action? Focus on beliefs over narrative.</li>
-                                <li class="flex gap-2"><svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <strong>Compare:</strong> Explicitly state how/why Perspective A is different from Perspective B.</li>
-                                <li class="flex gap-2"><svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <strong>Use Specific Evidence:</strong> Quote historical figures, use exact statistics.</li>
-                            </ul>
-                        </div>
-                    </div>
-
-                    <!-- Excellence Step -->
-                    <div class="flex flex-col md:flex-row gap-6 items-start">
-                        <div class="w-full md:w-1/4 pt-2 relative">
-                            <div class="absolute -top-3 -left-3 text-3xl animate-bounce">🏆</div>
-                            <span class="inline-block bg-[#c5a059] text-white font-black px-4 py-2 rounded-lg text-xl tracking-wide w-full text-center shadow-md">EXCELLENCE</span>
-                        </div>
-                        <div class="w-full md:w-3/4">
-                            <h3 class="text-xl font-bold text-[#002066] mb-2">Examine & Connect</h3>
-                            <p class="text-slate-600 mb-3 font-medium">Candidates discussed the perspectives and actions, deeply analyzed how or why they differed, and incorporated the wider historical context to fully develop their explanation.</p>
-                            <ul class="space-y-2 text-sm text-[#002066] font-semibold bg-orange-50 p-4 rounded-lg border border-[#c5a059]">
-                                <li class="flex gap-2"><svg class="w-5 h-5 text-[#c5a059] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <strong>Wider Context:</strong> Connect their actions to deeper motives or other past events (e.g., The beginning of the Cold War, or the Meiji military tradition).</li>
-                                <li class="flex gap-2"><svg class="w-5 h-5 text-[#c5a059] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <strong>Evidence Leads:</strong> Your entire argument is built around complex evidence.</li>
-                                <li class="flex gap-2"><svg class="w-5 h-5 text-[#c5a059] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <strong>Insightful Examination:</strong> Show deep understanding of the complexity of their beliefs.</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW 2: PERSPECTIVES -->
-        <div id="view-perspectives" class="hidden space-y-8 animate-in fade-in duration-500">
-            <div class="text-center max-w-3xl mx-auto mb-8">
-                <h2 class="text-4xl font-black text-slate-900 mb-4">Perspective Explorer</h2>
-                <p class="text-slate-600">Compare the core values, beliefs, and motivations of the two sides.</p>
-            </div>
-
-            <div class="glass-card p-6 md:p-8 border-t-4 border-t-[#c5a059] max-w-5xl mx-auto mb-8 shadow-sm bg-white">
-                <div class="grid md:grid-cols-2 gap-8">
-                    <!-- US Perspective -->
-                    <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
-                        <div class="bg-[#002066] p-6 text-white text-center">
-                            <h3 class="text-2xl font-black">🇺🇸 The US Administration</h3>
-                            <p class="text-blue-200 text-sm mt-1 font-medium">Truman, Stimson, Byrnes & Allies</p>
-                        </div>
-                        <div class="p-6 space-y-6 flex-1 bg-slate-50">
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                                <h4 class="text-xs font-bold uppercase tracking-widest text-[#002066] mb-2">Core Value / Belief</h4>
-                                <p class="text-slate-800 text-sm font-medium"><strong>Democracy & Security:</strong> Rooted in Roosevelt's "Four Freedoms" (speech, worship, want, fear). They believed authoritarian militarism had to be eradicated globally to prevent future wars.</p>
+                    <div class="space-y-8">
+                        <!-- Achieved Step -->
+                        <div class="flex flex-col md:flex-row gap-6 items-start border-b border-slate-200 dark:border-slate-700 pb-8">
+                            <div class="w-full md:w-1/4 pt-1">
+                                <span class="inline-block bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-400 font-black px-4 py-3 rounded-lg text-xl tracking-wide w-full text-center shadow-sm border border-emerald-200 dark:border-emerald-800">ACHIEVED</span>
                             </div>
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                                <h4 class="text-xs font-bold uppercase tracking-widest text-[#002066] mb-2">Primary Motivation</h4>
-                                <p class="text-slate-800 text-sm font-medium"><strong>End the war swiftly & avoid invasion:</strong> Truman wanted to save an estimated 1 Million+ US casualties (Operation Downfall). A secondary motivation was to rebuild Japan as a strong, democratic, capitalist ally.</p>
-                            </div>
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                                <h4 class="text-xs font-bold uppercase tracking-widest text-[#002066] mb-2">Historical Actions</h4>
-                                <ul class="list-disc pl-5 text-slate-700 text-sm space-y-1 font-medium marker:text-[#c5a059]">
-                                    <li>Issued the Potsdam Declaration (July 26).</li>
-                                    <li>Dropped the atomic bombs on Hiroshima and Nagasaki.</li>
-                                    <li>Drafted the ambiguous "Byrnes Note" (Aug 11).</li>
+                            <div class="w-full md:w-3/4">
+                                <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Identify & Describe</h3>
+                                <p class="text-slate-600 dark:text-slate-400 mb-4 font-medium">Candidates successfully described two perspectives and their corresponding actions or responses using relevant historical evidence.</p>
+                                <ul class="space-y-3 text-sm text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-700">
+                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Identify:</strong> Name the perspective clearly (e.g., The US Administration).</span></li>
+                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Describe Action:</strong> What did they actually do? (e.g., Dropped the atomic bombs).</span></li>
+                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Provide Evidence:</strong> Include a basic fact, quote, or date.</span></li>
                                 </ul>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Japanese Perspective -->
-                    <div class="border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col">
-                        <div class="bg-[#8b0000] p-6 text-white text-center">
-                            <h3 class="text-2xl font-black">🇯🇵 Emperor Hirohito</h3>
-                            <p class="text-red-200 text-sm mt-1 font-medium">The Japanese Leadership</p>
+                        <!-- Merit Step -->
+                        <div class="flex flex-col md:flex-row gap-6 items-start border-b border-slate-200 dark:border-slate-700 pb-8">
+                            <div class="w-full md:w-1/4 pt-1">
+                                <span class="inline-block bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-400 font-black px-4 py-3 rounded-lg text-xl tracking-wide w-full text-center shadow-sm border border-blue-200 dark:border-blue-800">MERIT</span>
+                            </div>
+                            <div class="w-full md:w-3/4">
+                                <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Explain & Compare</h3>
+                                <p class="text-slate-600 dark:text-slate-400 mb-4 font-medium">Candidates explained the perspectives and actions, detailed the differences between them, and supported this with relevant evidence.</p>
+                                <ul class="space-y-3 text-sm text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-700">
+                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Explain Motivations:</strong> Why did they take this action? Focus on deep beliefs over simple narrative.</span></li>
+                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Compare:</strong> Explicitly state how and why Perspective A is fundamentally different from Perspective B.</span></li>
+                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Use Specific Evidence:</strong> Quote historical figures, use exact statistics, and integrate them into your sentences.</span></li>
+                                </ul>
+                            </div>
                         </div>
-                        <div class="p-6 space-y-6 flex-1 bg-slate-50">
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                                <h4 class="text-xs font-bold uppercase tracking-widest text-[#8b0000] mb-2">Core Value / Belief</h4>
-                                <p class="text-slate-800 text-sm font-medium"><strong>Kokutai (National Essence):</strong> The preservation of the traditional Imperial system and the Emperor's divine status. This was viewed as more important than military victory.</p>
+
+                        <!-- Excellence Step -->
+                        <div class="flex flex-col md:flex-row gap-6 items-start">
+                            <div class="w-full md:w-1/4 pt-1 relative">
+                                <div class="absolute -top-4 -left-3 text-4xl animate-bounce drop-shadow-md">🏆</div>
+                                <span class="inline-block bg-whs-gold text-white font-black px-4 py-3 rounded-lg text-xl tracking-wide w-full text-center shadow-lg border border-[#a88647]">EXCELLENCE</span>
                             </div>
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                                <h4 class="text-xs font-bold uppercase tracking-widest text-[#8b0000] mb-2">Primary Motivation</h4>
-                                <p class="text-slate-800 text-sm font-medium"><strong>Prevent complete national collapse:</strong> Save Japan from total annihilation by atomic weapons and prevent a domestic communist revolution caused by famine and firebombing.</p>
-                            </div>
-                            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100">
-                                <h4 class="text-xs font-bold uppercase tracking-widest text-[#8b0000] mb-2">Historical Actions</h4>
-                                <ul class="list-disc pl-5 text-slate-700 text-sm space-y-1 font-medium marker:text-[#c5a059]">
-                                    <li>Intervened to break the 3-3 "Big Six" government stalemate (Aug 9-10).</li>
-                                    <li>Delivered the "Jewel Voice Broadcast" announcing surrender directly to the public.</li>
+                            <div class="w-full md:w-3/4">
+                                <h3 class="text-xl font-bold text-whs-dark dark:text-blue-300 mb-2">Examine & Connect</h3>
+                                <p class="text-slate-600 dark:text-slate-400 mb-4 font-medium">Candidates discussed the perspectives and actions, deeply analyzed how or why they differed, and incorporated the wider historical context to fully develop their explanation.</p>
+                                <ul class="space-y-3 text-sm text-whs-dark dark:text-blue-100 font-semibold bg-orange-50 dark:bg-blue-900/20 p-5 rounded-lg border border-whs-gold dark:border-blue-500/50 shadow-inner">
+                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-whs-gold dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Wider Context:</strong> Connect their actions to deeper motives or broader global shifts (e.g., The beginning of the Cold War, or the Meiji military tradition).</span></li>
+                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-whs-gold dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Evidence Leads:</strong> Your entire argument is built around complex evidence. Evidence proves the point, rather than just being tacked on.</span></li>
+                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-whs-gold dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Insightful Examination:</strong> Show deep understanding of the complexity and nuances of their beliefs.</span></li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- VIEW 3: EVIDENCE VAULT -->
-        <div id="view-vault" class="hidden space-y-8 animate-in fade-in duration-500">
-            <div class="text-center max-w-3xl mx-auto mb-8">
-                <h2 class="text-4xl font-black text-slate-900 mb-4">The Evidence Vault</h2>
-                <p class="text-slate-600">Incorporate these specific details into your essay to secure high grades.</p>
+            <!-- VIEW 2: PERSPECTIVES -->
+            <div id="view-perspectives" class="hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Perspective Explorer</h2>
+                    <p class="text-slate-600 dark:text-slate-400">Compare the core values, beliefs, and motivations of the two sides.</p>
+                </div>
+
+                <div class="glass-card p-6 md:p-8 border-t-4 border-t-whs-gold max-w-5xl mx-auto mb-8 bg-white dark:bg-slate-800 rounded-xl">
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <!-- US Perspective -->
+                        <div class="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm flex flex-col bg-slate-50 dark:bg-slate-900">
+                            <div class="bg-whs-dark dark:bg-blue-900 p-6 text-white text-center">
+                                <h3 class="text-2xl font-black">🇺🇸 The US Administration</h3>
+                                <p class="text-blue-200 text-sm mt-1 font-medium">Truman, Stimson, Byrnes & Allies</p>
+                            </div>
+                            <div class="p-6 space-y-6 flex-1">
+                                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                                    <h4 class="text-xs font-bold uppercase tracking-widest text-whs-dark dark:text-blue-400 mb-2">Core Value / Belief</h4>
+                                    <p class="text-slate-800 dark:text-slate-200 text-sm font-medium"><strong>Democracy & Security:</strong> Rooted in Roosevelt's "Four Freedoms" (speech, worship, want, fear). They believed authoritarian militarism had to be eradicated globally to prevent future wars.</p>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                                    <h4 class="text-xs font-bold uppercase tracking-widest text-whs-dark dark:text-blue-400 mb-2">Primary Motivation</h4>
+                                    <p class="text-slate-800 dark:text-slate-200 text-sm font-medium"><strong>End the war swiftly & avoid invasion:</strong> Truman wanted to save an estimated 1 Million+ US casualties (Operation Downfall). A secondary motivation was to rebuild Japan as a strong, democratic, capitalist ally.</p>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                                    <h4 class="text-xs font-bold uppercase tracking-widest text-whs-dark dark:text-blue-400 mb-2">Historical Actions</h4>
+                                    <ul class="list-disc pl-5 text-slate-700 dark:text-slate-300 text-sm space-y-2 font-medium marker:text-whs-gold">
+                                        <li>Issued the Potsdam Declaration (July 26).</li>
+                                        <li>Dropped the atomic bombs on Hiroshima and Nagasaki.</li>
+                                        <li>Drafted the ambiguous "Byrnes Note" (Aug 11).</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Japanese Perspective -->
+                        <div class="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm flex flex-col bg-slate-50 dark:bg-slate-900">
+                            <div class="bg-[#8b0000] dark:bg-red-900 p-6 text-white text-center">
+                                <h3 class="text-2xl font-black">🇯🇵 Emperor Hirohito</h3>
+                                <p class="text-red-200 text-sm mt-1 font-medium">The Japanese Leadership</p>
+                            </div>
+                            <div class="p-6 space-y-6 flex-1">
+                                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                                    <h4 class="text-xs font-bold uppercase tracking-widest text-[#8b0000] dark:text-red-400 mb-2">Core Value / Belief</h4>
+                                    <p class="text-slate-800 dark:text-slate-200 text-sm font-medium"><strong>Kokutai (National Essence):</strong> The preservation of the traditional Imperial system and the Emperor's divine status. This was viewed as more important than military victory.</p>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                                    <h4 class="text-xs font-bold uppercase tracking-widest text-[#8b0000] dark:text-red-400 mb-2">Primary Motivation</h4>
+                                    <p class="text-slate-800 dark:text-slate-200 text-sm font-medium"><strong>Prevent complete national collapse:</strong> Save Japan from total annihilation by atomic weapons and prevent a domestic communist revolution caused by famine and firebombing.</p>
+                                </div>
+                                <div class="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-100 dark:border-slate-700">
+                                    <h4 class="text-xs font-bold uppercase tracking-widest text-[#8b0000] dark:text-red-400 mb-2">Historical Actions</h4>
+                                    <ul class="list-disc pl-5 text-slate-700 dark:text-slate-300 text-sm space-y-2 font-medium marker:text-whs-gold">
+                                        <li>Intervened to break the 3-3 "Big Six" government stalemate (Aug 9-10).</li>
+                                        <li>Delivered the "Jewel Voice Broadcast" announcing surrender directly to the public.</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="glass-card p-6 md:p-8 border-t-4 border-t-[#10b981] max-w-5xl mx-auto mb-8 shadow-sm bg-white">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <!-- Dates -->
-                    <div>
-                        <div class="stage-header mb-4"><span class="stage-number-badge">1</span> Crucial Dates</div>
-                        <div class="evidence-box mb-3 border-l-4 border-l-[#10b981]">
-                            <span class="font-black text-[#002066] block mb-1 text-sm uppercase tracking-wider">July 26, 1945</span> 
-                            <span class="text-slate-700 text-sm font-medium">US, UK, and China issue the Potsdam Declaration, demanding unconditional surrender or face "prompt and utter destruction".</span>
+            <!-- VIEW 2.5: PRIMARY SOURCES (NEW) -->
+            <div id="view-sources" class="hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Primary Sources</h2>
+                    <p class="text-slate-600 dark:text-slate-400">Read and quote from the exact historical documents that shaped August 1945.</p>
+                </div>
+
+                <div class="max-w-5xl mx-auto space-y-8">
+                    
+                    <!-- Source 1: Potsdam -->
+                    <div class="glass-card bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+                        <div class="bg-slate-100 dark:bg-slate-900 p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                            <h3 class="font-bold text-whs-dark dark:text-blue-300">The Potsdam Declaration</h3>
+                            <span class="text-xs font-bold bg-white dark:bg-slate-700 px-2 py-1 rounded text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-600">July 26, 1945</span>
                         </div>
-                        <div class="evidence-box mb-3 border-l-4 border-l-[#10b981]">
-                            <span class="font-black text-[#002066] block mb-1 text-sm uppercase tracking-wider">August 6 & 9, 1945</span> 
-                            <span class="text-slate-700 text-sm font-medium">US drops atomic bombs on Hiroshima ("Little Boy") and Nagasaki ("Fat Man").</span>
-                        </div>
-                        <div class="evidence-box mb-3 border-l-4 border-l-[#10b981]">
-                            <span class="font-black text-[#002066] block mb-1 text-sm uppercase tracking-wider">August 8-9, 1945</span> 
-                            <span class="text-slate-700 text-sm font-medium">Soviet Union declares war on Japan and invades Manchuria, shattering hopes of a negotiated peace.</span>
-                        </div>
-                        <div class="evidence-box mb-3 border-l-4 border-l-[#10b981]">
-                            <span class="font-black text-[#002066] block mb-1 text-sm uppercase tracking-wider">August 9-10, 1945</span> 
-                            <span class="text-slate-700 text-sm font-medium">Emperor Hirohito takes the unprecedented step of intervening in the deadlocked debate during a midnight meeting.</span>
-                        </div>
-                        <div class="evidence-box mb-3 border-l-4 border-l-[#10b981]">
-                            <span class="font-black text-[#002066] block mb-1 text-sm uppercase tracking-wider">August 15, 1945</span> 
-                            <span class="text-slate-700 text-sm font-medium">Emperor Hirohito delivers the prerecorded Jewel Voice Broadcast (Gyokuon-hōsō) announcing surrender.</span>
-                        </div>
-                        <div class="evidence-box border-l-4 border-l-[#10b981]">
-                            <span class="font-black text-[#002066] block mb-1 text-sm uppercase tracking-wider">September 2, 1945</span> 
-                            <span class="text-slate-700 text-sm font-medium">Formal surrender signed aboard the USS Missouri.</span>
+                        <div class="p-6 md:p-8 prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-serif leading-relaxed text-sm md:text-base border-l-4 border-blue-500">
+                            <p>"(1) We-the President of the United States, the President of the National Government of the Republic of China, and the Prime Minister of Great Britain... have conferred and agree that Japan shall be given an opportunity to end this war."</p>
+                            <p>"(3) The result of the futile and senseless German resistance to the might of the aroused free peoples of the world stands forth in awful clarity as an example to the people of Japan... The full application of our military power, backed by our resolve, will mean the inevitable and complete destruction of the Japanese armed forces and just as inevitably the utter devastation of the Japanese homeland."</p>
+                            <p>"(13) We call upon the government of Japan to proclaim now the unconditional surrender of all Japanese armed forces, and to provide proper and adequate assurances of their good faith in such action. The alternative for Japan is <strong>prompt and utter destruction.</strong>"</p>
                         </div>
                     </div>
 
+                    <!-- Source 2: Jewel Voice -->
+                    <div class="glass-card bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+                        <div class="bg-slate-100 dark:bg-slate-900 p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                            <h3 class="font-bold text-[#8b0000] dark:text-red-400">The Jewel Voice Broadcast (Gyokuon-hōsō)</h3>
+                            <span class="text-xs font-bold bg-white dark:bg-slate-700 px-2 py-1 rounded text-slate-500 dark:text-slate-300 border border-slate-200 dark:border-slate-600">August 15, 1945</span>
+                        </div>
+                        <div class="p-6 md:p-8 prose dark:prose-invert max-w-none text-slate-700 dark:text-slate-300 font-serif leading-relaxed text-sm md:text-base border-l-4 border-red-500">
+                            <p>"To our good and loyal subjects: After pondering deeply the general trends of the world and the actual conditions obtaining in our empire today, we have decided to effect a settlement of the present situation by resorting to an extraordinary measure... We have ordered our empire to communicate to the governments of the United States, Great Britain, China and the Soviet Union that our empire accepts the provisions of their joint declaration."</p>
+                            <p>"Moreover, the enemy has begun to employ a new and most cruel bomb, the power of which to do damage is, indeed, incalculable, taking the toll of many innocent lives. Should we continue to fight, not only would it result in an ultimate collapse and obliteration of the Japanese nation, but also it would lead to the total extinction of human civilization."</p>
+                            <p>"We have resolved to pave the way for a grand peace for all the generations to come by <strong>enduring the unendurable and suffering what is insufferable.</strong>"</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 3: EVIDENCE VAULT -->
+            <div id="view-vault" class="hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">The Evidence Vault</h2>
+                    <p class="text-slate-600 dark:text-slate-400">Incorporate these specific details into your essay to secure high grades.</p>
+                </div>
+
+                <!-- Interactive Timeline Component (Replaces Static Dates List) -->
+                <div class="max-w-5xl mx-auto mb-8">
+                    <div class="glass-card bg-white dark:bg-slate-800 p-6 rounded-xl border-t-4 border-t-whs-dark">
+                        <div class="stage-header mb-6"><span class="stage-number-badge">1</span> Interactive Timeline: August 1945</div>
+                        
+                        <div class="flex overflow-x-auto gap-4 pb-6 pt-2 snap-x px-2" id="timeline-buttons">
+                            <!-- JS will toggle active class -->
+                            <button onclick="showTimeline('jul26', this)" class="timeline-btn active shrink-0 shadow-md">July 26</button>
+                            <button onclick="showTimeline('aug6', this)" class="timeline-btn shrink-0">Aug 6</button>
+                            <button onclick="showTimeline('aug8', this)" class="timeline-btn shrink-0">Aug 8</button>
+                            <button onclick="showTimeline('aug9', this)" class="timeline-btn shrink-0">Aug 9</button>
+                            <button onclick="showTimeline('aug9_10', this)" class="timeline-btn shrink-0">Aug 9-10</button>
+                            <button onclick="showTimeline('aug11', this)" class="timeline-btn shrink-0">Aug 11</button>
+                            <button onclick="showTimeline('aug15', this)" class="timeline-btn shrink-0">Aug 15</button>
+                            <button onclick="showTimeline('sep2', this)" class="timeline-btn shrink-0">Sep 2</button>
+                        </div>
+
+                        <!-- Timeline Display Area -->
+                        <div id="timeline-display" class="bg-blue-50 dark:bg-slate-900 p-6 rounded-lg border border-blue-200 dark:border-slate-700 shadow-inner min-h-[140px] flex items-center transition-opacity duration-300">
+                            <!-- Default Content -->
+                            <div>
+                                <h4 class="text-xl font-black text-whs-dark dark:text-blue-400 mb-2">July 26, 1945: The Potsdam Declaration</h4>
+                                <p class="text-slate-700 dark:text-slate-300 font-medium leading-relaxed">The US, UK, and China issue the Potsdam Declaration, demanding the unconditional surrender of all Japanese armed forces. It explicitly threatens "prompt and utter destruction" if Japan refuses.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
                     <!-- Names -->
-                    <div>
-                        <div class="stage-header mb-4"><span class="stage-number-badge">2</span> Key Names & Groups</div>
-                        <div class="evidence-box mb-3 border-l-4 border-l-[#c5a059]">
-                            <span class="font-black text-[#002066] block mb-1 text-sm uppercase tracking-wider">Emperor Hirohito</span> 
-                            <span class="text-slate-700 text-sm font-medium">Emperor of Japan. Stepped in to break a 3-3 deadlock, prioritizing the survival of the Japanese nation over the military's desire for a final defense.</span>
-                        </div>
-                        <div class="evidence-box mb-3 border-l-4 border-l-[#c5a059]">
-                            <span class="font-black text-[#002066] block mb-1 text-sm uppercase tracking-wider">Harry S. Truman</span> 
-                            <span class="text-slate-700 text-sm font-medium">US President who authorized the atomic bombs to end the war swiftly.</span>
-                        </div>
-                        <div class="evidence-box mb-3 border-l-4 border-l-[#c5a059]">
-                            <span class="font-black text-[#002066] block mb-1 text-sm uppercase tracking-wider">Henry L. Stimson</span> 
-                            <span class="text-slate-700 text-sm font-medium">US Secretary of War. Advocated for allowing Japan to keep the Emperor to secure a prompt surrender.</span>
-                        </div>
-                        <div class="evidence-box mb-3 border-l-4 border-l-[#c5a059]">
-                            <span class="font-black text-[#002066] block mb-1 text-sm uppercase tracking-wider">James F. Byrnes</span> 
-                            <span class="text-slate-700 text-sm font-medium">US Secretary of State. Drafted the "Byrnes Note" (Aug 11) keeping the Emperor's authority subject to the Supreme Commander.</span>
-                        </div>
-                        <div class="evidence-box mb-3 border-l-4 border-l-[#c5a059]">
-                            <span class="font-black text-[#002066] block mb-1 text-sm uppercase tracking-wider">The 'Big Six'</span> 
-                            <span class="text-slate-700 text-sm font-medium">Japan's Supreme War Council, paralyzed by a 3-3 split on surrendering.</span>
-                        </div>
-                        <div class="evidence-box mb-3 border-l-4 border-l-[#c5a059]">
-                            <span class="font-black text-[#002066] block mb-1 text-sm uppercase tracking-wider">Kantaro Suzuki</span> 
-                            <span class="text-slate-700 text-sm font-medium">Prime Minister of Japan. Asked the Emperor to make the final decision when the council was deadlocked.</span>
-                        </div>
-                        <div class="evidence-box border-l-4 border-l-[#c5a059]">
-                            <span class="font-black text-[#002066] block mb-1 text-sm uppercase tracking-wider">Gen. Korechika Anami</span> 
-                            <span class="text-slate-700 text-sm font-medium">Japanese Minister of War. Hardliner pushing for Ketsu-Gō (decisive mainland battle).</span>
-                        </div>
-                    </div>
-
-                    <!-- Stats -->
-                    <div>
-                        <div class="stage-header mb-4"><span class="stage-number-badge">3</span> Vital Statistics</div>
-                        <div class="flex items-center gap-4 bg-white p-4 rounded-lg border border-slate-200 mb-3 shadow-sm">
-                            <div class="text-3xl font-black text-[#002066]">3-3</div>
-                            <div class="text-sm text-slate-800 font-bold">Stalemate in the "Big Six" council (3 for peace with conditions, 3 for war).</div>
-                        </div>
-                        <div class="flex items-center gap-4 bg-white p-4 rounded-lg border border-slate-200 mb-3 shadow-sm">
-                            <div class="text-3xl font-black text-[#002066]">70k-135k</div>
-                            <div class="text-sm text-slate-800 font-bold">Estimated casualties in Hiroshima (39k-80k in Nagasaki).</div>
-                        </div>
-                        <div class="flex items-center gap-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm mb-3">
-                            <div class="text-3xl font-black text-[#002066]">1M+</div>
-                            <div class="text-sm text-slate-800 font-bold">Upper estimate of US casualties for 'Operation Downfall' (land invasion).</div>
-                        </div>
-                        <div class="flex items-center gap-4 bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
-                            <div class="text-3xl font-black text-[#002066]">6 Days</div>
-                            <div class="text-sm text-slate-800 font-bold">Time between Nagasaki bombing and Hirohito's public surrender broadcast.</div>
-                        </div>
-                    </div>
-
-                    <!-- Quotes -->
-                    <div>
-                        <div class="stage-header mb-4"><span class="stage-number-badge">4</span> Power Quotes</div>
-                        <div class="evidence-box mb-3">
-                            <span class="font-black text-slate-900 block mb-1 font-mono">"Kokutai"</span>
-                            <p class="text-slate-600 italic text-sm font-medium">National Essence and Imperial preservation.</p>
-                        </div>
-                        <div class="evidence-box mb-3">
-                            <span class="font-black text-slate-900 block mb-1 font-mono">"...by enduring the unendurable and suffering what is insufferable."</span>
-                            <p class="text-slate-600 italic text-sm font-medium">— Emperor Hirohito, August 15 broadcast.</p>
-                        </div>
-                        <div class="evidence-box mb-3">
-                            <span class="font-black text-slate-900 block mb-1 font-mono">"...lead to the total extinction of human civilization."</span>
-                            <p class="text-slate-600 italic text-sm font-medium">— Emperor Hirohito, explicitly citing the new "cruel bomb" as a reason for surrender.</p>
-                        </div>
-                        <div class="evidence-box mb-3">
-                            <span class="font-black text-slate-900 block mb-1 font-mono">"...expect a rain of ruin from the air..."</span>
-                            <p class="text-slate-600 italic text-sm font-medium">— President Truman, warning Japan on August 6.</p>
-                        </div>
-                        <div class="evidence-box">
-                            <span class="font-black text-slate-900 block mb-1 font-mono">"...a surrender would be much more easily obtained if we allowed them to retain their Emperor."</span>
-                            <p class="text-slate-600 italic text-sm font-medium">— US Secretary of War Henry Stimson.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW 4: BLUEPRINT -->
-        <div id="view-blueprint" class="hidden space-y-8 animate-in fade-in duration-500">
-            <div class="text-center max-w-3xl mx-auto mb-8">
-                <h2 class="text-4xl font-black text-slate-900 mb-4">Excellence Blueprint</h2>
-                <p class="text-slate-600">How to structure your essay and include the Wider Context to get an 'E'.</p>
-            </div>
-
-            <!-- Wider Context Callout -->
-            <div class="whs-gradient-bg text-white p-8 rounded-2xl shadow-lg mb-8 max-w-5xl mx-auto relative overflow-hidden">
-                <div class="relative z-10">
-                    <h3 class="text-2xl font-black mb-6 flex items-center gap-2 text-[#c5a059] uppercase tracking-widest">
-                        The Secret to Excellence: Wider Context
-                    </h3>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div class="bg-white/10 p-5 rounded-xl border border-white/20 backdrop-blur-sm">
-                            <h4 class="font-bold text-white mb-2 text-lg">For the US: The Cold War</h4>
-                            <p class="text-sm text-blue-100 leading-relaxed font-medium">Truman wasn't just ending WWII; he was preparing for the Cold War. The occupation aimed to turn Japan into a democratic, capitalist shield against the Soviet Union in the Pacific.</p>
-                        </div>
-                        <div class="bg-white/10 p-5 rounded-xl border border-white/20 backdrop-blur-sm">
-                            <h4 class="font-bold text-white mb-2 text-lg">For Hirohito: Meiji Tradition</h4>
-                            <p class="text-sm text-blue-100 leading-relaxed font-medium">By personally intervening to surrender, Hirohito broke decades of military dominance dating back to the 1868 Meiji Restoration. He sacrificed military pride to save the ultimate prize: the <em>Kokutai</em>.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="glass-card p-8 border-t-4 border-t-[#002066] max-w-5xl mx-auto bg-white">
-                <h3 class="text-2xl font-bold text-slate-800 mb-6 border-b pb-3">Paragraph Planners</h3>
-                <div class="space-y-8">
-                    <!-- Paragraph 1 -->
-                    <div class="border-l-4 border-[#002066] pl-6">
-                        <h4 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                            <span class="bg-blue-100 text-[#002066] w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">1</span>
-                            The US Administration
-                        </h4>
-                        <div class="space-y-4">
-                            <div class="flex flex-col md:flex-row md:gap-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
-                                <div class="w-32 font-bold text-slate-500 text-[10px] uppercase tracking-widest mb-1 md:mb-0">Topic Sent.</div>
-                                <div class="text-slate-800 text-sm font-medium flex-1">Driven by the desire to avoid massive casualties and secure a post-war ally, the US Administration’s perspective was anchored in achieving unconditional surrender.</div>
+                    <div class="glass-card bg-white dark:bg-slate-800 p-6 rounded-xl border-t-4 border-t-whs-gold h-max">
+                        <div class="stage-header mb-6"><span class="stage-number-badge">2</span> Key Names & Groups</div>
+                        <div class="space-y-3">
+                            <div class="evidence-box border-l-4 border-l-whs-gold">
+                                <span class="font-black text-whs-dark dark:text-blue-300 block mb-1 text-sm uppercase tracking-wider">Emperor Hirohito</span> 
+                                <span class="text-slate-700 dark:text-slate-300 text-sm font-medium">Emperor of Japan. Stepped in to break a 3-3 deadlock, prioritizing the survival of the Japanese nation over the military's desire for a final defense.</span>
                             </div>
-                            <div class="flex flex-col md:flex-row md:gap-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
-                                <div class="w-32 font-bold text-slate-500 text-[10px] uppercase tracking-widest mb-1 md:mb-0">Evidence</div>
-                                <div class="text-slate-700 text-sm flex-1 font-mono font-medium">"Unconditional Surrender," Potsdam Declaration (July 26), 1M+ projected casualties, Truman's "rain of ruin".</div>
+                            <div class="evidence-box border-l-4 border-l-whs-gold">
+                                <span class="font-black text-whs-dark dark:text-blue-300 block mb-1 text-sm uppercase tracking-wider">Harry S. Truman</span> 
+                                <span class="text-slate-700 dark:text-slate-300 text-sm font-medium">US President who authorized the atomic bombs to end the war swiftly.</span>
+                            </div>
+                            <div class="evidence-box border-l-4 border-l-whs-gold">
+                                <span class="font-black text-whs-dark dark:text-blue-300 block mb-1 text-sm uppercase tracking-wider">Henry L. Stimson</span> 
+                                <span class="text-slate-700 dark:text-slate-300 text-sm font-medium">US Secretary of War. Advocated for allowing Japan to keep the Emperor to secure a prompt surrender.</span>
+                            </div>
+                            <div class="evidence-box border-l-4 border-l-whs-gold">
+                                <span class="font-black text-whs-dark dark:text-blue-300 block mb-1 text-sm uppercase tracking-wider">James F. Byrnes</span> 
+                                <span class="text-slate-700 dark:text-slate-300 text-sm font-medium">US Secretary of State. Drafted the "Byrnes Note" keeping the Emperor's authority subject to the Supreme Commander.</span>
+                            </div>
+                            <div class="evidence-box border-l-4 border-l-whs-gold">
+                                <span class="font-black text-whs-dark dark:text-blue-300 block mb-1 text-sm uppercase tracking-wider">The 'Big Six'</span> 
+                                <span class="text-slate-700 dark:text-slate-300 text-sm font-medium">Japan's Supreme War Council, paralyzed by a 3-3 split on surrendering.</span>
+                            </div>
+                            <div class="evidence-box border-l-4 border-l-whs-gold">
+                                <span class="font-black text-whs-dark dark:text-blue-300 block mb-1 text-sm uppercase tracking-wider">Kantaro Suzuki</span> 
+                                <span class="text-slate-700 dark:text-slate-300 text-sm font-medium">Prime Minister of Japan. Asked the Emperor to make the final decision when the council was deadlocked.</span>
+                            </div>
+                            <div class="evidence-box border-l-4 border-l-whs-gold">
+                                <span class="font-black text-whs-dark dark:text-blue-300 block mb-1 text-sm uppercase tracking-wider">Gen. Korechika Anami</span> 
+                                <span class="text-slate-700 dark:text-slate-300 text-sm font-medium">Japanese Minister of War. Hardliner pushing for Ketsu-Gō (decisive mainland battle).</span>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Paragraph 2 -->
-                    <div class="border-l-4 border-[#8b0000] pl-6">
-                        <h4 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                            <span class="bg-red-100 text-[#8b0000] w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">2</span>
-                            Emperor Hirohito
-                        </h4>
-                        <div class="space-y-4">
-                            <div class="flex flex-col md:flex-row md:gap-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
-                                <div class="w-32 font-bold text-slate-500 text-[10px] uppercase tracking-widest mb-1 md:mb-0">Topic Sent.</div>
-                                <div class="text-slate-800 text-sm font-medium flex-1">Conversely, Emperor Hirohito’s perspective was defined by a desperate need to preserve the traditional Japanese imperial system in the face of total destruction.</div>
+                    <div class="space-y-6">
+                        <!-- Stats -->
+                        <div class="glass-card bg-white dark:bg-slate-800 p-6 rounded-xl border-t-4 border-t-[#10b981]">
+                            <div class="stage-header mb-6"><span class="stage-number-badge">3</span> Vital Statistics</div>
+                            <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700 mb-3 shadow-sm">
+                                <div class="text-3xl font-black text-whs-dark dark:text-emerald-400">3-3</div>
+                                <div class="text-sm text-slate-800 dark:text-slate-300 font-bold">Stalemate in the "Big Six" council (3 for peace with conditions, 3 for war).</div>
                             </div>
-                            <div class="flex flex-col md:flex-row md:gap-6 bg-slate-50 p-4 rounded-lg border border-slate-200">
-                                <div class="w-32 font-bold text-slate-500 text-[10px] uppercase tracking-widest mb-1 md:mb-0">Evidence</div>
-                                <div class="text-slate-700 text-sm flex-1 font-mono font-medium">Kokutai, breaking the 3-3 "Big Six" stalemate (Aug 9-10), the "Jewel Voice Broadcast" (Aug 15).</div>
+                            <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700 mb-3 shadow-sm">
+                                <div class="text-3xl font-black text-whs-dark dark:text-emerald-400">70k-135k</div>
+                                <div class="text-sm text-slate-800 dark:text-slate-300 font-bold">Estimated casualties in Hiroshima (39k-80k in Nagasaki).</div>
+                            </div>
+                            <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm mb-3">
+                                <div class="text-3xl font-black text-whs-dark dark:text-emerald-400">1M+</div>
+                                <div class="text-sm text-slate-800 dark:text-slate-300 font-bold">Upper estimate of US casualties for 'Operation Downfall' (land invasion).</div>
+                            </div>
+                            <div class="flex items-center gap-4 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <div class="text-3xl font-black text-whs-dark dark:text-emerald-400">6 Days</div>
+                                <div class="text-sm text-slate-800 dark:text-slate-300 font-bold">Time between Nagasaki bombing and Hirohito's public surrender broadcast.</div>
+                            </div>
+                        </div>
+
+                        <!-- Quotes -->
+                        <div class="glass-card bg-white dark:bg-slate-800 p-6 rounded-xl border-t-4 border-t-whs-dark">
+                            <div class="stage-header mb-6"><span class="stage-number-badge">4</span> Power Quotes</div>
+                            <div class="space-y-3">
+                                <div class="evidence-box border-l-4 border-l-slate-300 dark:border-l-slate-600">
+                                    <span class="font-black text-slate-900 dark:text-white block mb-1 font-mono">"Kokutai"</span>
+                                    <p class="text-slate-600 dark:text-slate-400 italic text-sm font-medium">National Essence and Imperial preservation.</p>
+                                </div>
+                                <div class="evidence-box border-l-4 border-l-slate-300 dark:border-l-slate-600">
+                                    <span class="font-black text-slate-900 dark:text-white block mb-1 font-mono">"...by enduring the unendurable and suffering what is insufferable."</span>
+                                    <p class="text-slate-600 dark:text-slate-400 italic text-sm font-medium">— Emperor Hirohito, August 15 broadcast.</p>
+                                </div>
+                                <div class="evidence-box border-l-4 border-l-slate-300 dark:border-l-slate-600">
+                                    <span class="font-black text-slate-900 dark:text-white block mb-1 font-mono">"...lead to the total extinction of human civilization."</span>
+                                    <p class="text-slate-600 dark:text-slate-400 italic text-sm font-medium">— Emperor Hirohito, explicitly citing the new "cruel bomb" as a reason for surrender.</p>
+                                </div>
+                                <div class="evidence-box border-l-4 border-l-slate-300 dark:border-l-slate-600">
+                                    <span class="font-black text-slate-900 dark:text-white block mb-1 font-mono">"...expect a rain of ruin from the air..."</span>
+                                    <p class="text-slate-600 dark:text-slate-400 italic text-sm font-medium">— President Truman, warning Japan on August 6.</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- VIEW 5: WRITING SANDBOX -->
-        <div id="view-feedback" class="hidden space-y-8 animate-in fade-in duration-500">
-            <div class="text-center max-w-3xl mx-auto mb-8">
-                <h2 class="text-4xl font-black text-slate-900 mb-4">Writing Sandbox</h2>
-                <p class="text-slate-600">Select a prompt, draft your paragraph, and get instant evidence analysis.</p>
-            </div>
+            <!-- VIEW 4: BLUEPRINT -->
+            <div id="view-blueprint" class="hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Excellence Blueprint</h2>
+                    <p class="text-slate-600 dark:text-slate-400">How to structure your essay and include the Wider Context to get an 'E'.</p>
+                </div>
 
-            <div class="max-w-6xl mx-auto mb-6 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
-                <span class="text-xs font-bold uppercase tracking-widest text-[#002066] block mb-3">Select a Question to Answer:</span>
-                <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-2">
-                    <button class="question-btn active p-3 text-left rounded-lg text-xs font-semibold bg-[#fefce8] border-[#c5a059] text-[#854d0e] hover:bg-yellow-50" onclick="setSandboxQuestion(0, this)">1: Identify an individual or group. What was their perspective?</button>
-                    <button class="question-btn p-3 text-left rounded-lg text-xs font-semibold bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100" onclick="setSandboxQuestion(1, this)">2: How did ONE action demonstrate this perspective?</button>
-                    <button class="question-btn p-3 text-left rounded-lg text-xs font-semibold bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100" onclick="setSandboxQuestion(2, this)">3: Identify a different group. How does their perspective differ?</button>
-                    <button class="question-btn p-3 text-left rounded-lg text-xs font-semibold bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100" onclick="setSandboxQuestion(3, this)">4: How did ONE action by group 2 differ from group 1?</button>
+                <!-- Wider Context Callout w/ Tooltips -->
+                <div class="bg-gradient-to-br from-[#002066] to-blue-900 text-white p-8 rounded-2xl shadow-lg mb-8 max-w-5xl mx-auto relative overflow-hidden">
+                    <div class="relative z-10">
+                        <h3 class="text-2xl font-black mb-6 flex items-center gap-2 text-[#c5a059] uppercase tracking-widest">
+                            The Secret to Excellence: 
+                            <span class="relative group cursor-help underline decoration-dotted decoration-white/50 hover:text-white transition">
+                                Wider Context
+                                <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-3 bg-slate-900 dark:bg-black text-white text-xs font-normal rounded-lg opacity-0 group-hover:opacity-100 transition shadow-xl pointer-events-none z-50 normal-case tracking-normal">
+                                    The overarching historical landscape (e.g., the impending Cold War, or the 70-year tradition of Meiji military dominance). Connecting to this shows deep understanding.
+                                    <svg class="absolute text-slate-900 dark:text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
+                                </span>
+                            </span>
+                        </h3>
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-white/10 p-5 rounded-xl border border-white/20 backdrop-blur-sm">
+                                <h4 class="font-bold text-white mb-2 text-lg">For the US: The Cold War</h4>
+                                <p class="text-sm text-blue-50 leading-relaxed font-medium">Truman wasn't just ending WWII; he was preparing for the Cold War. The occupation aimed to turn Japan into a democratic, capitalist shield against the Soviet Union in the Pacific.</p>
+                            </div>
+                            <div class="bg-white/10 p-5 rounded-xl border border-white/20 backdrop-blur-sm">
+                                <h4 class="font-bold text-white mb-2 text-lg">For Hirohito: Meiji Tradition</h4>
+                                <p class="text-sm text-blue-50 leading-relaxed font-medium">By personally intervening to surrender, Hirohito broke decades of military dominance dating back to the 1868 Meiji Restoration. He sacrificed military pride to save the ultimate prize: the <em>Kokutai</em>.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card p-8 border-t-4 border-t-whs-dark max-w-5xl mx-auto bg-white dark:bg-slate-800 rounded-xl">
+                    <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-6 border-b border-slate-200 dark:border-slate-700 pb-3">Paragraph Planners</h3>
+                    <div class="space-y-8">
+                        <!-- Paragraph 1 -->
+                        <div class="border-l-4 border-whs-dark dark:border-blue-500 pl-6">
+                            <h4 class="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-3">
+                                <span class="bg-blue-100 dark:bg-blue-900 text-whs-dark dark:text-blue-300 w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">1</span>
+                                The US Administration
+                            </h4>
+                            <div class="space-y-4">
+                                <div class="flex flex-col md:flex-row md:gap-6 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <div class="w-32 font-bold text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-widest mb-1 md:mb-0">Topic Sent.</div>
+                                    <div class="text-slate-800 dark:text-slate-200 text-sm font-medium flex-1">Driven by the desire to avoid massive casualties and secure a post-war ally, the US Administration’s perspective was anchored in achieving unconditional surrender.</div>
+                                </div>
+                                <div class="flex flex-col md:flex-row md:gap-6 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <div class="w-32 font-bold text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-widest mb-1 md:mb-0">Evidence</div>
+                                    <div class="text-slate-700 dark:text-slate-300 text-sm flex-1 font-mono font-medium">"Unconditional Surrender," Potsdam Declaration (July 26), 1M+ projected casualties, Truman's "rain of ruin".</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Paragraph 2 -->
+                        <div class="border-l-4 border-[#8b0000] dark:border-red-500 pl-6">
+                            <h4 class="text-xl font-bold text-slate-800 dark:text-white mb-4 flex items-center gap-3">
+                                <span class="bg-red-100 dark:bg-red-900 text-[#8b0000] dark:text-red-300 w-8 h-8 rounded-full flex items-center justify-center text-sm font-black">2</span>
+                                Emperor Hirohito
+                            </h4>
+                            <div class="space-y-4">
+                                <div class="flex flex-col md:flex-row md:gap-6 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <div class="w-32 font-bold text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-widest mb-1 md:mb-0">Topic Sent.</div>
+                                    <div class="text-slate-800 dark:text-slate-200 text-sm font-medium flex-1">Conversely, Emperor Hirohito’s perspective was defined by a desperate need to preserve the traditional Japanese imperial system in the face of total destruction.</div>
+                                </div>
+                                <div class="flex flex-col md:flex-row md:gap-6 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                                    <div class="w-32 font-bold text-slate-500 dark:text-slate-400 text-[10px] uppercase tracking-widest mb-1 md:mb-0">Evidence</div>
+                                    <div class="text-slate-700 dark:text-slate-300 text-sm flex-1 font-mono font-medium">Kokutai, breaking the 3-3 "Big Six" stalemate (Aug 9-10), the "Jewel Voice Broadcast" (Aug 15).</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                <!-- Editor -->
-                <div class="lg:col-span-2 glass-card p-6 border-t-4 border-t-[#c5a059] bg-white shadow-sm flex flex-col">
-                    <div id="active-question-display" class="mb-4 p-3 bg-[#002066] text-white font-bold rounded text-sm shadow-inner leading-relaxed">
-                        1 - Identify an individual or group from your chosen historical context. What was their perspective?
-                    </div>
-                    <textarea id="sandbox-text" class="w-full flex-1 min-h-[250px] p-4 rounded-lg border-2 border-slate-200 focus:border-[#c5a059] outline-none text-slate-800 font-medium resize-y" placeholder="Start typing your response here..."></textarea>
-                    <div class="mt-4 flex justify-between items-center">
-                        <span class="text-xs font-bold text-slate-400" id="word-count">0 words</span>
-                        <button onclick="analyzeText()" class="px-6 py-2.5 bg-[#c5a059] hover:bg-[#b08d48] text-white font-bold rounded-lg transition shadow-md">Analyse Evidence ➔</button>
+            <!-- VIEW 5: WRITING SANDBOX -->
+            <div id="view-feedback" class="hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Writing Sandbox</h2>
+                    <p class="text-slate-600 dark:text-slate-400">Select a prompt, draft your paragraph, and get instant evidence analysis.</p>
+                </div>
+
+                <div class="max-w-6xl mx-auto mb-6 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <span class="text-xs font-bold uppercase tracking-widest text-whs-dark dark:text-blue-400 block mb-3">Select a Question to Answer:</span>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-2">
+                        <button class="question-btn active p-3 text-left rounded-lg text-xs font-semibold bg-[#fefce8] border-whs-gold text-[#854d0e] dark:bg-yellow-900/30 dark:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/50" onclick="setSandboxQuestion(0, this)">1: Identify an individual or group. What was their perspective?</button>
+                        <button class="question-btn p-3 text-left rounded-lg text-xs font-semibold bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" onclick="setSandboxQuestion(1, this)">2: How did ONE action demonstrate this perspective?</button>
+                        <button class="question-btn p-3 text-left rounded-lg text-xs font-semibold bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" onclick="setSandboxQuestion(2, this)">3: Identify a different group. How does their perspective differ?</button>
+                        <button class="question-btn p-3 text-left rounded-lg text-xs font-semibold bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" onclick="setSandboxQuestion(3, this)">4: How did ONE action by group 2 differ from group 1?</button>
                     </div>
                 </div>
 
-                <!-- Live Feedback -->
-                <div class="glass-card p-6 border-t-4 border-t-[#10b981] bg-white shadow-sm h-max">
-                    <h3 class="text-lg font-black text-[#002066] uppercase tracking-widest mb-4 border-b pb-2">Instant Analysis</h3>
+                <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto items-start">
                     
-                    <div id="analysis-results" class="hidden">
-                        <div class="mb-6">
-                            <span class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1 block">Evidence Strength</span>
-                            <div class="w-full bg-slate-200 rounded-full h-3 relative overflow-hidden">
-                                <div class="bg-[#10b981] h-3 rounded-full transition-all duration-500" id="strength-bar" style="width: 0%"></div>
-                            </div>
-                            <p class="text-right text-xs font-bold mt-1 text-slate-600" id="strength-text">0%</p>
+                    <!-- Editor -->
+                    <div class="lg:col-span-2 glass-card p-6 border-t-4 border-t-whs-gold bg-white dark:bg-slate-800 shadow-sm flex flex-col h-full rounded-xl">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="text-xs font-bold uppercase tracking-widest text-whs-dark dark:text-blue-400 block">Drafting Area</span>
+                            <button onclick="togglePeel()" class="px-3 py-1 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-600 dark:text-slate-300 text-xs font-bold rounded transition border border-slate-200 dark:border-slate-600">Show PEEL Guide</button>
                         </div>
-
-                        <div class="space-y-4">
-                            <div>
-                                <h4 class="text-xs font-bold uppercase tracking-widest text-slate-700 mb-2">Key Names Detected:</h4>
-                                <div id="found-names" class="flex flex-wrap gap-1">None yet.</div>
+                        
+                        <!-- PEEL Helper -->
+                        <div id="peel-guide" class="hidden grid-cols-2 md:grid-cols-4 gap-2 mb-4 animate-in fade-in">
+                            <div class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded border border-blue-200 dark:border-blue-800">
+                                <span class="font-bold text-blue-800 dark:text-blue-300 text-xs uppercase block">Point</span>
+                                <p class="text-[10px] text-slate-600 dark:text-slate-400 leading-tight mt-1">State the perspective and the action clearly.</p>
                             </div>
-                            <div>
-                                <h4 class="text-xs font-bold uppercase tracking-widest text-slate-700 mb-2">Crucial Dates/Stats:</h4>
-                                <div id="found-dates" class="flex flex-wrap gap-1">None yet.</div>
+                            <div class="bg-emerald-50 dark:bg-emerald-900/30 p-3 rounded border border-emerald-200 dark:border-emerald-800">
+                                <span class="font-bold text-emerald-800 dark:text-emerald-300 text-xs uppercase block">Evidence</span>
+                                <p class="text-[10px] text-slate-600 dark:text-slate-400 leading-tight mt-1">Provide exact names, dates, quotes, or stats.</p>
                             </div>
-                            <div>
-                                <h4 class="text-xs font-bold uppercase tracking-widest text-slate-700 mb-2">Power Concepts:</h4>
-                                <div id="found-concepts" class="flex flex-wrap gap-1">None yet.</div>
+                            <div class="bg-purple-50 dark:bg-purple-900/30 p-3 rounded border border-purple-200 dark:border-purple-800">
+                                <span class="font-bold text-purple-800 dark:text-purple-300 text-xs uppercase block">Explain</span>
+                                <p class="text-[10px] text-slate-600 dark:text-slate-400 leading-tight mt-1">Why did this evidence prove their deep motivation?</p>
                             </div>
-                            
-                            <!-- Fact Check Module -->
-                            <div id="fact-check-module" class="hidden mt-4 pt-4 border-t border-slate-200">
-                                <h4 class="text-xs font-bold uppercase tracking-widest text-red-600 mb-2 flex items-center gap-1">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
-                                    Possible Factual Errors:
-                                </h4>
-                                <ul id="found-errors" class="text-xs text-red-700 font-medium space-y-1 pl-4 list-disc">
-                                </ul>
+                            <div class="bg-orange-50 dark:bg-orange-900/30 p-3 rounded border border-orange-200 dark:border-orange-800">
+                                <span class="font-bold text-orange-800 dark:text-orange-300 text-xs uppercase block">Link</span>
+                                <p class="text-[10px] text-slate-600 dark:text-slate-400 leading-tight mt-1">Connect to the Wider Context (e.g. Cold War).</p>
                             </div>
                         </div>
 
-                        <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-[#002066] font-medium" id="feedback-message">
-                            Write at least 50 words and include specific evidence to get feedback.
+                        <div id="active-question-display" class="mb-4 p-4 bg-whs-dark dark:bg-blue-900 text-white font-bold rounded-lg text-sm shadow-inner leading-relaxed">
+                            1 - Identify an individual or group from your chosen historical context. What was their perspective?
+                        </div>
+                        <textarea id="sandbox-text" class="w-full flex-1 min-h-[300px] p-4 rounded-lg border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 focus:border-whs-gold outline-none text-slate-800 dark:text-slate-200 font-medium resize-y" placeholder="Start typing your response here... (Your work auto-saves locally)"></textarea>
+                        
+                        <div class="mt-4 flex flex-wrap justify-between items-center gap-4">
+                            <div class="flex items-center gap-4">
+                                <span class="text-xs font-bold text-slate-400" id="word-count">0 words</span>
+                                <span class="text-xs font-bold text-emerald-500 opacity-0 transition-opacity" id="save-indicator">Saved ✓</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="copyDraft()" id="copy-btn" class="px-4 py-2 bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 font-bold rounded-lg transition shadow-sm text-sm">Copy</button>
+                                <button onclick="analyzeText()" class="px-6 py-2 bg-whs-gold hover:bg-[#b08d48] text-white font-bold rounded-lg transition shadow-md">Analyse ➔</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Live Feedback (Sticky) -->
+                    <div class="glass-card p-6 border-t-4 border-t-[#10b981] bg-white dark:bg-slate-800 shadow-sm rounded-xl self-start sticky top-24">
+                        <h3 class="text-lg font-black text-whs-dark dark:text-blue-300 uppercase tracking-widest mb-4 border-b border-slate-200 dark:border-slate-700 pb-2">Instant Analysis</h3>
+                        
+                        <div id="analysis-results" class="hidden">
+                            <div class="mb-6">
+                                <span class="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-1 block">Evidence Strength</span>
+                                <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 relative overflow-hidden">
+                                    <div class="bg-[#10b981] h-3 rounded-full transition-all duration-500" id="strength-bar" style="width: 0%"></div>
+                                </div>
+                                <p class="text-right text-xs font-bold mt-1 text-slate-600 dark:text-slate-400" id="strength-text">0%</p>
+                            </div>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <h4 class="text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-2">Key Names:</h4>
+                                    <div id="found-names" class="flex flex-wrap gap-1">None yet.</div>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-2">Crucial Dates/Stats:</h4>
+                                    <div id="found-dates" class="flex flex-wrap gap-1">None yet.</div>
+                                </div>
+                                <div>
+                                    <h4 class="text-xs font-bold uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-2">Power Concepts:</h4>
+                                    <div id="found-concepts" class="flex flex-wrap gap-1">None yet.</div>
+                                </div>
+                                
+                                <!-- NLP Fact Check Module -->
+                                <div id="fact-check-module" class="hidden mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                                    <h4 class="text-xs font-bold uppercase tracking-widest text-red-600 dark:text-red-400 mb-2 flex items-center gap-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                        Possible Factual Errors:
+                                    </h4>
+                                    <ul id="found-errors" class="text-xs text-red-700 dark:text-red-400 font-medium space-y-2 pl-4 list-disc">
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-whs-dark dark:text-blue-200 font-medium" id="feedback-message">
+                                Write at least 50 words and include specific evidence to get feedback.
+                            </div>
+                        </div>
+                        
+                        <div id="analysis-placeholder" class="text-center py-10 text-slate-400">
+                            <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <p class="text-sm font-bold">Write your paragraph and click Analyse to see your score.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 7: EXEMPLARS -->
+            <div id="view-exemplars" class="hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-8">
+                    <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Grade Exemplars</h2>
+                    <p class="text-slate-600 dark:text-slate-400">See the exact difference between Not Achieved, Achieved, Merit, and Excellence paragraphs.</p>
+                </div>
+
+                <div class="max-w-5xl mx-auto space-y-6">
+                    
+                    <!-- Not Achieved -->
+                    <div class="glass-card bg-white dark:bg-slate-800 p-6 border-l-8 border-l-red-500 flex flex-col md:flex-row gap-6 rounded-xl">
+                        <div class="md:w-2/3">
+                            <span class="text-xs font-black text-red-700 dark:text-red-300 uppercase tracking-widest bg-red-100 dark:bg-red-900/50 px-2 py-1 rounded mb-3 inline-block">Not Achieved</span>
+                            <p class="text-slate-800 dark:text-slate-200 font-medium leading-relaxed">The Americans dropped the atomic bomb on Japan in 1945. They did this because they wanted to win the war quickly. Truman was the president. After the bomb, Japan surrendered and then General MacArthur came to Japan to fix everything up.</p>
+                        </div>
+                        <div class="md:w-1/3 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700 text-sm text-slate-600 dark:text-slate-400">
+                            <strong class="text-slate-800 dark:text-white block mb-1">Why is this NA?</strong>
+                            This is just storytelling. It states facts (Truman, 1945) but does not actually identify the <em>perspective</em> (values/beliefs) of the US. It just describes an event. It ignores the Chief Marker's advice to focus on the <strong>"why"</strong>.
+                        </div>
+                    </div>
+
+                    <!-- Achieved -->
+                    <div class="glass-card bg-white dark:bg-slate-800 p-6 border-l-8 border-l-emerald-500 flex flex-col md:flex-row gap-6 rounded-xl">
+                        <div class="md:w-2/3">
+                            <span class="text-xs font-black text-emerald-800 dark:text-emerald-300 uppercase tracking-widest bg-emerald-100 dark:bg-emerald-900/50 px-2 py-1 rounded mb-3 inline-block">Achieved</span>
+                            <p class="text-slate-800 dark:text-slate-200 font-medium leading-relaxed">The US Administration's perspective was that they needed to defeat Japan completely using "Unconditional Surrender". President Truman decided to drop the atomic bombs on Hiroshima and Nagasaki in August 1945. This action demonstrated their perspective because they believed a land invasion would cause too many casualties, so they used the bomb to force Japan to give up quickly and allow the US to rebuild the country as a democracy.</p>
+                        </div>
+                        <div class="md:w-1/3 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700 text-sm text-slate-600 dark:text-slate-400">
+                            <strong class="text-slate-800 dark:text-white block mb-1">Why is this Achieved?</strong>
+                            It clearly identifies the perspective ("needed to defeat Japan completely") and describes the action taken to demonstrate it (dropping the bombs). It includes basic evidence ("Unconditional Surrender", Aug 1945).
+                        </div>
+                    </div>
+
+                    <!-- Merit -->
+                    <div class="glass-card bg-white dark:bg-slate-800 p-6 border-l-8 border-l-blue-500 flex flex-col md:flex-row gap-6 rounded-xl">
+                        <div class="md:w-2/3">
+                            <span class="text-xs font-black text-blue-800 dark:text-blue-300 uppercase tracking-widest bg-blue-100 dark:bg-blue-900/50 px-2 py-1 rounded mb-3 inline-block">Merit</span>
+                            <p class="text-slate-800 dark:text-slate-200 font-medium leading-relaxed">The US Administration’s perspective was anchored in achieving "Unconditional Surrender" to permanently eradicate Japanese militarism. Driven by the motivation to avoid an estimated 1 million+ US casualties that a land invasion (Operation Downfall) could cause, President Truman authorized the use of atomic weapons in August 1945. This perspective differed significantly from Emperor Hirohito's. While the US prioritized securing a total military victory and establishing a post-war democracy, Hirohito's primary motivation was to preserve the <em>Kokutai</em> (National Essence) and his own divine status. This difference explains why the US demanded unconditional surrender, whereas Japan's leadership delayed, hoping to negotiate terms that would protect the Emperor.</p>
+                        </div>
+                        <div class="md:w-1/3 bg-slate-50 dark:bg-slate-900 p-4 rounded-lg border border-slate-200 dark:border-slate-700 text-sm text-slate-600 dark:text-slate-400">
+                            <strong class="text-slate-800 dark:text-white block mb-1">Why is this Merit?</strong>
+                            It deeply explains the <em>motivations</em> (avoiding 1M+ casualties vs. preserving Kokutai). Crucially, it explicitly compares the two perspectives and explains <em>why</em> they differed. Uses excellent specific evidence.
+                        </div>
+                    </div>
+
+                    <!-- Excellence -->
+                    <div class="glass-card bg-white dark:bg-slate-800 p-6 border-l-8 border-l-whs-gold flex flex-col md:flex-row gap-6 shadow-md relative overflow-hidden rounded-xl">
+                        <div class="absolute -right-4 -bottom-4 text-6xl opacity-10">🏆</div>
+                        <div class="md:w-2/3 relative z-10">
+                            <span class="text-xs font-black text-white uppercase tracking-widest bg-whs-gold px-2 py-1 rounded mb-3 inline-block">Excellence</span>
+                            <p class="text-slate-800 dark:text-slate-200 font-medium leading-relaxed">The US Administration’s perspective was anchored in achieving "Unconditional Surrender" to permanently eradicate Japanese militarism. Driven by the immediate motivation to avoid an estimated 1 million+ US casualties, President Truman authorized the use of atomic weapons. However, examining the wider historical context reveals a secondary, strategic motivation: the looming Cold War. Truman's actions demonstrated a perspective focused on asserting US dominance over the Soviet Union (who shattered Japan's peace hopes by invading Manchuria on August 8). By forcing a swift surrender and drafting the ambiguous "Byrnes Note" to keep the Emperor subordinate, the US perspective was to rapidly rebuild Japan into a capitalist, democratic bulwark against Communism in the Pacific, fundamentally differing from Japan's inward-looking focus on imperial survival.</p>
+                        </div>
+                        <div class="md:w-1/3 bg-orange-50 dark:bg-yellow-900/20 p-4 rounded-lg border border-whs-gold text-sm text-slate-800 dark:text-slate-300 relative z-10">
+                            <strong class="text-whs-dark dark:text-blue-300 block mb-1 font-black">Why is this Excellence?</strong>
+                            It does everything Merit does, but seamlessly connects the immediate motivations to the <strong>Wider Context</strong> (The Cold War, Soviet invasion on Aug 8, capitalist bulwark). The evidence (Byrnes Note) leads the complex explanation.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 8: PRACTICE HUB (QUIZ & FLASHCARDS) -->
+            <div id="view-practice" class="hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-6">
+                    <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Vault Practice Hub</h2>
+                    <p class="text-slate-600 dark:text-slate-400">Test your knowledge of the specific details required for the exam.</p>
+                </div>
+
+                <div class="flex justify-center mb-6">
+                    <div class="bg-slate-200 dark:bg-slate-700 p-1 rounded-lg flex shadow-inner">
+                        <button id="toggle-quiz" class="px-6 py-2 rounded-md font-bold text-sm bg-white dark:bg-slate-900 text-whs-dark dark:text-blue-400 shadow-sm transition" onclick="setPracticeMode('quiz')">Random Quiz</button>
+                        <button id="toggle-flash" class="px-6 py-2 rounded-md font-bold text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition" onclick="setPracticeMode('flash')">Flashcards</button>
+                    </div>
+                </div>
+
+                <!-- Quiz Container -->
+                <div id="quiz-mode-container" class="glass-card p-6 md:p-10 border-t-4 border-t-[#10b981] max-w-3xl mx-auto shadow-sm bg-white dark:bg-slate-800 rounded-xl block">
+                    <div id="quiz-container">
+                        <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-slate-700 pb-4">
+                            <span class="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400" id="quiz-progress">Question 1 of 5</span>
+                            <span class="text-sm font-bold bg-[#10b981] text-white px-3 py-1 rounded-full shadow-sm" id="quiz-score">Score: 0</span>
+                        </div>
+                        
+                        <h3 class="text-2xl font-black text-whs-dark dark:text-white mb-6" id="quiz-question">Loading...</h3>
+                        
+                        <div class="space-y-3" id="quiz-options">
+                            <!-- Options injected via JS -->
+                        </div>
+
+                        <div class="mt-8 hidden" id="quiz-feedback-container">
+                            <p class="p-4 rounded-lg font-medium text-sm mb-4" id="quiz-explanation"></p>
+                            <button id="quiz-next-btn" class="w-full py-3 bg-whs-dark hover:bg-blue-800 text-white font-bold rounded-lg transition shadow-md">Next Question ➔</button>
                         </div>
                     </div>
                     
-                    <div id="analysis-placeholder" class="text-center py-10 text-slate-400">
-                        <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        <p class="text-sm font-bold">Write your paragraph and click Analyse to see your score.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- VIEW 6: EXEMPLARS -->
-        <div id="view-exemplars" class="hidden space-y-8 animate-in fade-in duration-500">
-            <div class="text-center max-w-3xl mx-auto mb-8">
-                <h2 class="text-4xl font-black text-slate-900 mb-4">Grade Exemplars</h2>
-                <p class="text-slate-600">See the exact difference between Not Achieved, Achieved, Merit, and Excellence paragraphs.</p>
-            </div>
-
-            <div class="max-w-5xl mx-auto space-y-6">
-                
-                <!-- Not Achieved -->
-                <div class="glass-card bg-white p-6 border-l-8 border-l-red-500 flex flex-col md:flex-row gap-6">
-                    <div class="md:w-2/3">
-                        <span class="text-xs font-black text-red-600 uppercase tracking-widest bg-red-100 px-2 py-1 rounded mb-3 inline-block">Not Achieved</span>
-                        <p class="text-slate-800 font-medium leading-relaxed">The Americans dropped the atomic bomb on Japan in 1945. They did this because they wanted to win the war quickly. Truman was the president. After the bomb, Japan surrendered and then General MacArthur came to Japan to fix everything up.</p>
-                    </div>
-                    <div class="md:w-1/3 bg-slate-50 p-4 rounded-lg border border-slate-200 text-sm text-slate-600">
-                        <strong class="text-slate-800 block mb-1">Why is this NA?</strong>
-                        This is just storytelling. It states facts (Truman, 1945) but does not actually identify the <em>perspective</em> (values/beliefs) of the US. It just describes an event. It ignores the Chief Marker's advice to focus on the <strong>"why"</strong>.
+                    <!-- Quiz Results Screen -->
+                    <div class="text-center hidden" id="quiz-results">
+                        <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-2">Quiz Complete!</h2>
+                        <p class="text-xl text-slate-600 dark:text-slate-400 mb-6">You scored <span id="final-score" class="font-black text-whs-gold">0/5</span></p>
+                        <div id="results-message" class="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg mb-8 text-slate-700 dark:text-slate-300 font-medium"></div>
+                        <button onclick="initQuiz()" class="px-8 py-3 bg-[#10b981] hover:bg-emerald-600 text-white font-bold rounded-lg transition shadow-md">Generate 5 New Questions</button>
                     </div>
                 </div>
 
-                <!-- Achieved -->
-                <div class="glass-card bg-white p-6 border-l-8 border-l-emerald-500 flex flex-col md:flex-row gap-6">
-                    <div class="md:w-2/3">
-                        <span class="text-xs font-black text-emerald-700 uppercase tracking-widest bg-emerald-100 px-2 py-1 rounded mb-3 inline-block">Achieved</span>
-                        <p class="text-slate-800 font-medium leading-relaxed">The US Administration's perspective was that they needed to defeat Japan completely using "Unconditional Surrender". President Truman decided to drop the atomic bombs on Hiroshima and Nagasaki in August 1945. This action demonstrated their perspective because they believed a land invasion would cause too many casualties, so they used the bomb to force Japan to give up quickly and allow the US to rebuild the country as a democracy.</p>
-                    </div>
-                    <div class="md:w-1/3 bg-slate-50 p-4 rounded-lg border border-slate-200 text-sm text-slate-600">
-                        <strong class="text-slate-800 block mb-1">Why is this Achieved?</strong>
-                        It clearly identifies the perspective ("needed to defeat Japan completely") and describes the action taken to demonstrate it (dropping the bombs). It includes basic evidence ("Unconditional Surrender", Aug 1945).
-                    </div>
-                </div>
-
-                <!-- Merit -->
-                <div class="glass-card bg-white p-6 border-l-8 border-l-blue-500 flex flex-col md:flex-row gap-6">
-                    <div class="md:w-2/3">
-                        <span class="text-xs font-black text-blue-700 uppercase tracking-widest bg-blue-100 px-2 py-1 rounded mb-3 inline-block">Merit</span>
-                        <p class="text-slate-800 font-medium leading-relaxed">The US Administration’s perspective was anchored in achieving "Unconditional Surrender" to permanently eradicate Japanese militarism. Driven by the motivation to avoid an estimated 1 million+ US casualties that a land invasion (Operation Downfall) could cause, President Truman authorized the use of atomic weapons in August 1945. This perspective differed significantly from Emperor Hirohito's. While the US prioritized securing a total military victory and establishing a post-war democracy, Hirohito's primary motivation was to preserve the <em>Kokutai</em> (National Essence) and his own divine status. This difference explains why the US demanded unconditional surrender, whereas Japan's leadership delayed, hoping to negotiate terms that would protect the Emperor.</p>
-                    </div>
-                    <div class="md:w-1/3 bg-slate-50 p-4 rounded-lg border border-slate-200 text-sm text-slate-600">
-                        <strong class="text-slate-800 block mb-1">Why is this Merit?</strong>
-                        It deeply explains the <em>motivations</em> (avoiding 1M+ casualties vs. preserving Kokutai). Crucially, it explicitly compares the two perspectives and explains <em>why</em> they differed. Uses excellent specific evidence.
-                    </div>
-                </div>
-
-                <!-- Excellence -->
-                <div class="glass-card bg-white p-6 border-l-8 border-l-[#c5a059] flex flex-col md:flex-row gap-6 shadow-md relative overflow-hidden">
-                    <div class="absolute -right-4 -bottom-4 text-6xl opacity-10">🏆</div>
-                    <div class="md:w-2/3 relative z-10">
-                        <span class="text-xs font-black text-white uppercase tracking-widest bg-[#c5a059] px-2 py-1 rounded mb-3 inline-block">Excellence</span>
-                        <p class="text-slate-800 font-medium leading-relaxed">The US Administration’s perspective was anchored in achieving "Unconditional Surrender" to permanently eradicate Japanese militarism. Driven by the immediate motivation to avoid an estimated 1 million+ US casualties, President Truman authorized the use of atomic weapons. However, examining the wider historical context reveals a secondary, strategic motivation: the looming Cold War. Truman's actions demonstrated a perspective focused on asserting US dominance over the Soviet Union (who shattered Japan's peace hopes by invading Manchuria on August 8). By forcing a swift surrender and drafting the ambiguous "Byrnes Note" to keep the Emperor subordinate, the US perspective was to rapidly rebuild Japan into a capitalist, democratic bulwark against Communism in the Pacific, fundamentally differing from Japan's inward-looking focus on imperial survival.</p>
-                    </div>
-                    <div class="md:w-1/3 bg-orange-50 p-4 rounded-lg border border-[#c5a059] text-sm text-slate-800 relative z-10">
-                        <strong class="text-[#002066] block mb-1 font-black">Why is this Excellence?</strong>
-                        It does everything Merit does, but seamlessly connects the immediate motivations to the <strong>Wider Context</strong> (The Cold War, Soviet invasion on Aug 8, capitalist bulwark). The evidence (Byrnes Note) leads the complex explanation.
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <!-- VIEW 7: PRACTICE HUB (QUIZ & FLASHCARDS) -->
-        <div id="view-practice" class="hidden space-y-8 animate-in fade-in duration-500">
-            <div class="text-center max-w-3xl mx-auto mb-6">
-                <h2 class="text-4xl font-black text-slate-900 mb-4">Vault Practice Hub</h2>
-                <p class="text-slate-600">Test your knowledge of the specific details required for the exam.</p>
-            </div>
-
-            <div class="flex justify-center mb-6">
-                <div class="bg-slate-200 p-1 rounded-lg flex shadow-inner">
-                    <button id="toggle-quiz" class="px-6 py-2 rounded-md font-bold text-sm bg-white text-[#002066] shadow-sm transition" onclick="setPracticeMode('quiz')">Random Quiz</button>
-                    <button id="toggle-flash" class="px-6 py-2 rounded-md font-bold text-sm text-slate-500 hover:text-slate-800 transition" onclick="setPracticeMode('flash')">Flashcards</button>
-                </div>
-            </div>
-
-            <!-- Quiz Container -->
-            <div id="quiz-mode-container" class="glass-card p-6 md:p-10 border-t-4 border-t-[#10b981] max-w-3xl mx-auto shadow-sm bg-white block">
-                <div id="quiz-container">
-                    <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
-                        <span class="text-sm font-bold uppercase tracking-widest text-slate-500" id="quiz-progress">Question 1 of 5</span>
-                        <span class="text-sm font-bold bg-[#10b981] text-white px-3 py-1 rounded-full shadow-sm" id="quiz-score">Score: 0</span>
+                <!-- Flashcard Container -->
+                <div id="flash-mode-container" class="max-w-2xl mx-auto hidden">
+                    <div class="flex justify-between items-center mb-4 px-4">
+                        <span class="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400" id="flash-progress">Card 1</span>
+                        <span class="text-xs text-slate-400 font-medium italic">Click card to flip</span>
                     </div>
                     
-                    <h3 class="text-2xl font-black text-[#002066] mb-6" id="quiz-question">Loading...</h3>
-                    
-                    <div class="space-y-3" id="quiz-options">
-                        <!-- Options injected via JS -->
-                    </div>
-
-                    <div class="mt-8 hidden" id="quiz-feedback-container">
-                        <p class="p-4 rounded-lg font-medium text-sm mb-4" id="quiz-explanation"></p>
-                        <button id="quiz-next-btn" class="w-full py-3 bg-[#002066] hover:bg-blue-800 text-white font-bold rounded-lg transition shadow-md">Next Question ➔</button>
-                    </div>
-                </div>
-                
-                <!-- Quiz Results Screen -->
-                <div class="text-center hidden" id="quiz-results">
-                    <h2 class="text-4xl font-black text-slate-900 mb-2">Quiz Complete!</h2>
-                    <p class="text-xl text-slate-600 mb-6">You scored <span id="final-score" class="font-black text-[#c5a059]">0/5</span></p>
-                    <div id="results-message" class="p-4 bg-slate-50 border border-slate-200 rounded-lg mb-8 text-slate-700 font-medium"></div>
-                    <button onclick="initQuiz()" class="px-8 py-3 bg-[#10b981] hover:bg-emerald-600 text-white font-bold rounded-lg transition shadow-md">Generate 5 New Questions</button>
-                </div>
-            </div>
-
-            <!-- Flashcard Container -->
-            <div id="flash-mode-container" class="max-w-2xl mx-auto hidden">
-                <div class="flex justify-between items-center mb-4 px-4">
-                    <span class="text-sm font-bold uppercase tracking-widest text-slate-500" id="flash-progress">Card 1</span>
-                    <span class="text-xs text-slate-400 font-medium italic">Click card to flip</span>
-                </div>
-                
-                <div class="h-64 md:h-80 w-full mb-6">
-                    <div id="flashcard-element" class="flip-card w-full h-full" onclick="toggleFlip()">
-                        <div class="flip-card-inner shadow-lg">
-                            <div class="flip-card-front bg-slate-50">
-                                <h3 class="text-3xl font-black text-center" id="flash-front-text">Front</h3>
-                            </div>
-                            <div class="flip-card-back">
-                                <p class="text-xl font-medium text-center" id="flash-back-text">Back</p>
+                    <div class="h-64 md:h-80 w-full mb-6">
+                        <div id="flashcard-element" class="flip-card w-full h-full" onclick="toggleFlip()">
+                            <div class="flip-card-inner shadow-lg">
+                                <div class="flip-card-front bg-slate-50 dark:bg-slate-800 border-whs-dark dark:border-blue-500">
+                                    <h3 class="text-3xl font-black text-center text-whs-dark dark:text-blue-300" id="flash-front-text">Front</h3>
+                                </div>
+                                <div class="flip-card-back bg-whs-dark dark:bg-blue-900 border-whs-dark dark:border-blue-500">
+                                    <p class="text-xl font-medium text-center text-white" id="flash-back-text">Back</p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                
-                <div class="flex justify-between gap-4">
-                    <button onclick="prevCard()" class="flex-1 py-3 bg-white border-2 border-[#002066] text-[#002066] font-bold rounded-lg transition hover:bg-blue-50 shadow-sm">⬅ Previous</button>
-                    <button onclick="nextCard()" class="flex-1 py-3 bg-[#002066] text-white font-bold rounded-lg transition hover:bg-blue-800 shadow-sm">Next ➔</button>
+                    
+                    <div class="flex justify-between gap-4">
+                        <button onclick="prevCard()" class="flex-1 py-3 bg-white dark:bg-slate-800 border-2 border-whs-dark dark:border-blue-500 text-whs-dark dark:text-blue-400 font-bold rounded-lg transition hover:bg-blue-50 dark:hover:bg-slate-700 shadow-sm">⬅ Previous</button>
+                        <button onclick="nextCard()" class="flex-1 py-3 bg-whs-dark dark:bg-blue-600 hover:bg-blue-800 dark:hover:bg-blue-500 text-white font-bold rounded-lg transition shadow-sm">Next ➔</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <footer class="mt-16 pt-8 border-t border-slate-200 text-center text-slate-400 text-sm pb-8 font-bold uppercase tracking-wider">
+        </main>
+
+        <footer class="mt-16 pt-8 border-t border-slate-200 dark:border-slate-700 text-center text-slate-400 text-sm pb-8 font-bold uppercase tracking-wider">
             <p>Waiheke High School History Department</p>
         </footer>
     </div>
 
     <script>
+        // --- Dark Mode Logic ---
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            const isDark = document.documentElement.classList.contains('dark');
+            localStorage.setItem('whs_theme', isDark ? 'dark' : 'light');
+        }
+        // Check saved theme on load
+        if (localStorage.getItem('whs_theme') === 'dark' || (!('whs_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
         // --- Navigation Logic ---
         document.body.addEventListener('click', function(e) {
             var target = e.target.closest('[data-action="view"]');
@@ -650,7 +751,7 @@
             
             var viewId = target.getAttribute('data-target');
             
-            ['standard', 'exemplars', 'perspectives', 'vault', 'blueprint', 'practice', 'feedback'].forEach(function(v) {
+            ['standard', 'sources', 'perspectives', 'vault', 'blueprint', 'practice', 'feedback', 'exemplars'].forEach(function(v) {
                 var el = document.getElementById('view-' + v);
                 var btn = document.querySelector('[data-target="' + v + '"]');
                 if (el) { el.classList.remove('block'); el.classList.add('hidden'); }
@@ -662,6 +763,33 @@
             if (activeView) { activeView.classList.remove('hidden'); activeView.classList.add('block'); }
             if (activeBtn) activeBtn.classList.add('nav-active');
         });
+
+        // --- Interactive Timeline Logic ---
+        const timelineData = {
+            'jul26': { title: 'July 26, 1945: The Potsdam Declaration', text: 'The US, UK, and China issue the Potsdam Declaration, demanding the unconditional surrender of all Japanese armed forces. It explicitly threatens "prompt and utter destruction" if Japan refuses.' },
+            'aug6': { title: 'August 6, 1945: Hiroshima', text: 'The US drops the first atomic bomb ("Little Boy") on the city of Hiroshima. An estimated 70,000 to 135,000 people are killed.' },
+            'aug8': { title: 'August 8, 1945: Soviet Invasion', text: 'The Soviet Union officially declares war on Japan and invades Japanese-occupied Manchuria. This shatters Japanese hopes of Soviet mediation for a negotiated peace.' },
+            'aug9': { title: 'August 9, 1945: Nagasaki', text: 'The US drops the second atomic bomb ("Fat Man") on the city of Nagasaki, killing an estimated 39,000 to 80,000 people.' },
+            'aug9_10': { title: 'August 9-10, 1945: The Emperor Intervenes', text: 'During a midnight meeting of the Supreme Council for the Direction of the War, Emperor Hirohito takes the unprecedented step of intervening in the 3-3 deadlocked debate, deciding to accept the Potsdam Declaration provided the imperial institution is preserved.' },
+            'aug11': { title: 'August 11, 1945: The Byrnes Note', text: 'US Secretary of State James F. Byrnes drafts a response to Japan stating that the authority of the Emperor would be "subject to the Supreme Commander of the Allied powers." It provides just enough ambiguity for Japan to surrender.' },
+            'aug15': { title: 'August 15, 1945: Jewel Voice Broadcast', text: 'Emperor Hirohito\'s prerecorded radio address (the Gyokuon-hōsō) is broadcast to the Japanese people, publicly announcing the surrender and citing the "cruel bomb".' },
+            'sep2': { title: 'September 2, 1945: Formal Surrender', text: 'Formal surrender documents are signed by Japanese delegates and Allied forces aboard the USS Missouri in Tokyo Bay, officially ending WWII.' }
+        };
+
+        function showTimeline(id, btnElement) {
+            const display = document.getElementById('timeline-display');
+            const data = timelineData[id];
+            
+            document.querySelectorAll('.timeline-btn').forEach(btn => btn.classList.remove('active', 'shadow-md'));
+            btnElement.classList.add('active', 'shadow-md');
+
+            display.style.opacity = 0;
+            setTimeout(() => {
+                display.innerHTML = `<div><h4 class="text-xl font-black text-whs-dark dark:text-blue-400 mb-2">${data.title}</h4><p class="text-slate-700 dark:text-slate-300 font-medium leading-relaxed">${data.text}</p></div>`;
+                display.style.opacity = 1;
+            }, 200);
+        }
+
 
         // --- Practice Hub (Quiz & Flashcards) Logic ---
         const masterQuizData = [
@@ -690,13 +818,13 @@
             const fCon = document.getElementById('flash-mode-container');
 
             if(mode === 'quiz') {
-                qBtn.className = "px-6 py-2 rounded-md font-bold text-sm bg-white text-[#002066] shadow-sm transition";
-                fBtn.className = "px-6 py-2 rounded-md font-bold text-sm text-slate-500 hover:text-slate-800 transition";
+                qBtn.className = "px-6 py-2 rounded-md font-bold text-sm bg-white dark:bg-slate-900 text-whs-dark dark:text-blue-400 shadow-sm transition";
+                fBtn.className = "px-6 py-2 rounded-md font-bold text-sm text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition";
                 qCon.classList.remove('hidden'); qCon.classList.add('block');
                 fCon.classList.add('hidden'); fCon.classList.remove('block');
             } else {
-                fBtn.className = "px-6 py-2 rounded-md font-bold text-sm bg-white text-[#002066] shadow-sm transition";
-                qBtn.className = "px-6 py-2 rounded-md font-bold text-sm text-slate-500 hover:text-slate-800 transition";
+                fBtn.className = "px-6 py-2 rounded-md font-bold text-sm bg-white dark:bg-slate-900 text-whs-dark dark:text-blue-400 shadow-sm transition";
+                qBtn.className = "px-6 py-2 rounded-md font-bold text-sm text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition";
                 fCon.classList.remove('hidden'); fCon.classList.add('block');
                 qCon.classList.add('hidden'); qCon.classList.remove('block');
                 initFlashcards();
@@ -715,7 +843,7 @@
 
         function initQuiz() {
             const shuffledPool = shuffle([...masterQuizData]);
-            activeQuizPool = shuffledPool.slice(0, 5); // Always pick 5 random questions
+            activeQuizPool = shuffledPool.slice(0, 5); 
             
             currentQIndex = 0;
             score = 0;
@@ -736,7 +864,7 @@
             
             q.opts.forEach((opt, index) => {
                 const btn = document.createElement('div');
-                btn.className = 'quiz-option bg-white text-slate-700';
+                btn.className = 'quiz-option bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700';
                 btn.innerText = opt;
                 btn.onclick = () => selectAnswer(index, btn);
                 optsContainer.appendChild(btn);
@@ -760,7 +888,7 @@
             const feedbackContainer = document.getElementById('quiz-feedback-container');
             const expText = document.getElementById('quiz-explanation');
             expText.innerText = q.exp;
-            expText.className = selectedIndex === q.ans ? 'p-4 rounded-lg font-medium text-sm mb-4 bg-emerald-50 text-emerald-800 border border-emerald-200' : 'p-4 rounded-lg font-medium text-sm mb-4 bg-red-50 text-red-800 border border-red-200';
+            expText.className = selectedIndex === q.ans ? 'p-4 rounded-lg font-medium text-sm mb-4 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'p-4 rounded-lg font-medium text-sm mb-4 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800';
             
             feedbackContainer.classList.remove('hidden');
         }
@@ -852,9 +980,9 @@
         function setSandboxQuestion(index, btnElement) {
             const allBtns = document.querySelectorAll('.question-btn');
             allBtns.forEach(btn => {
-                btn.className = "question-btn p-3 text-left rounded-lg text-xs font-semibold bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100";
+                btn.className = "question-btn p-3 text-left rounded-lg text-xs font-semibold bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800";
             });
-            btnElement.className = "question-btn active p-3 text-left rounded-lg text-xs font-semibold bg-[#fefce8] border-[#c5a059] text-[#854d0e] hover:bg-yellow-50";
+            btnElement.className = "question-btn active p-3 text-left rounded-lg text-xs font-semibold bg-[#fefce8] border-whs-gold text-[#854d0e] dark:bg-yellow-900/30 dark:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/50";
             document.getElementById('active-question-display').innerText = sandboxPrompts[index];
         }
 
@@ -864,22 +992,49 @@
             concepts: ['kokutai', 'unconditional surrender', 'potsdam', 'byrnes note', 'annihilation', 'gentle conqueror', 'boundless gratitude', 'cold war', 'meiji', 'soviet', 'downfall', 'ketsu', 'rain of ruin']
         };
 
+        // Regex Error Checks for expanded NLP fact-checking
         const errorChecks = [
-            { trigger: "atomic bomb on tokyo", warning: "Error: The atomic bombs were dropped on Hiroshima and Nagasaki, not Tokyo (which was firebombed earlier)." },
-            { trigger: "hirohito dropped", warning: "Error: Emperor Hirohito did not drop the bomb; US President Truman authorized it." },
-            { trigger: "macarthur dropped", warning: "Error: General MacArthur was the Supreme Commander of the occupation, but Truman authorized the atomic bombs." },
-            { trigger: "hirohito wanted to continue", warning: "Error: Hirohito broke the deadlock to SURRENDER. It was military hardliners like Anami who wanted to continue the war." },
-            { trigger: "soviet union dropped", warning: "Error: The Soviet Union declared war and invaded Manchuria, but the US dropped the atomic bombs." }
+            { regex: /atomic bomb(s)? on tokyo/i, warning: "Error: The atomic bombs were dropped on Hiroshima and Nagasaki, not Tokyo (which was firebombed earlier)." },
+            { regex: /hirohito dropped/i, warning: "Error: Emperor Hirohito did not drop the bomb; US President Truman authorized it." },
+            { regex: /macarthur dropped/i, warning: "Error: General MacArthur was the Supreme Commander of the occupation, but Truman authorized the atomic bombs." },
+            { regex: /hirohito wanted to continue|hirohito wanted to fight/i, warning: "Error: Hirohito broke the deadlock to SURRENDER. It was military hardliners like Anami who wanted to continue the war." },
+            { regex: /soviet(s)? dropped|russia(ns)? dropped/i, warning: "Error: The Soviet Union declared war and invaded Manchuria, but the US dropped the atomic bombs." },
+            { regex: /fdr dropped|roosevelt dropped/i, warning: "Error: FDR died in April 1945. Truman authorized the bombs." },
+            { regex: /august 6(.{1,15})nagasaki/i, warning: "Error: Hiroshima was bombed on August 6; Nagasaki was bombed on August 9." },
+            { regex: /august 9(.{1,15})hiroshima/i, warning: "Error: Hiroshima was bombed on August 6; Nagasaki was bombed on August 9." }
         ];
 
         const textArea = document.getElementById('sandbox-text');
+        
+        // Auto-save logic
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedDraft = localStorage.getItem('whs_draft_essay');
+            if (savedDraft) {
+                textArea.value = savedDraft;
+                const words = savedDraft.trim().split(/\s+/).filter(w => w.length > 0).length;
+                document.getElementById('word-count').innerText = `${words} words`;
+                if(words > 20) analyzeText();
+            }
+        });
+
+        let typingTimer;
         textArea.addEventListener('input', () => {
             const words = textArea.value.trim().split(/\s+/).filter(w => w.length > 0).length;
             document.getElementById('word-count').innerText = `${words} words`;
+            
+            // Auto-save indication
+            clearTimeout(typingTimer);
+            typingTimer = setTimeout(() => {
+                localStorage.setItem('whs_draft_essay', textArea.value);
+                const ind = document.getElementById('save-indicator');
+                ind.style.opacity = 1;
+                setTimeout(() => { ind.style.opacity = 0; }, 2000);
+            }, 1500);
         });
 
         function analyzeText() {
-            const text = textArea.value.toLowerCase();
+            const rawText = textArea.value;
+            const text = rawText.toLowerCase();
             const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
             
             document.getElementById('analysis-placeholder').classList.add('hidden');
@@ -898,12 +1053,12 @@
             const foundDates = vaultKeywords.dates.filter(kw => text.includes(kw));
             const foundConcepts = vaultKeywords.concepts.filter(kw => text.includes(kw));
 
-            renderBadges('found-names', foundNames, 'bg-purple-100 text-purple-800');
-            renderBadges('found-dates', foundDates, 'bg-blue-100 text-blue-800');
-            renderBadges('found-concepts', foundConcepts, 'bg-orange-100 text-orange-800');
+            renderBadges('found-names', foundNames, 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300');
+            renderBadges('found-dates', foundDates, 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300');
+            renderBadges('found-concepts', foundConcepts, 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300');
 
-            // Fact Checking
-            const foundErrors = errorChecks.filter(err => text.includes(err.trigger));
+            // Regex Fact Checking
+            const foundErrors = errorChecks.filter(err => err.regex.test(text));
             const errorModule = document.getElementById('fact-check-module');
             const errorList = document.getElementById('found-errors');
             
@@ -921,7 +1076,7 @@
             
             if (text.includes('cold war') || text.includes('meiji') || text.includes('soviet')) score += 10;
 
-            if (foundErrors.length > 0) score = Math.max(score - 20, 10); // Penalty for factual errors
+            if (foundErrors.length > 0) score = Math.max(score - 20, 10);
 
             score = Math.min(score, 100);
 
@@ -951,6 +1106,38 @@
             document.getElementById('found-names').innerHTML = '<span class="text-xs text-slate-400 italic">None yet.</span>';
             document.getElementById('found-dates').innerHTML = '<span class="text-xs text-slate-400 italic">None yet.</span>';
             document.getElementById('found-concepts').innerHTML = '<span class="text-xs text-slate-400 italic">None yet.</span>';
+        }
+
+        function copyDraft() {
+            const text = textArea.value;
+            if(!text) return;
+            const btn = document.getElementById('copy-btn');
+            
+            const tmp = document.createElement("textarea");
+            tmp.value = text;
+            document.body.appendChild(tmp);
+            tmp.select();
+            document.execCommand('copy');
+            document.body.removeChild(tmp);
+            
+            btn.innerText = "Copied ✓";
+            btn.classList.add('bg-emerald-100', 'text-emerald-800');
+            setTimeout(() => {
+                btn.innerText = "Copy";
+                btn.classList.remove('bg-emerald-100', 'text-emerald-800');
+            }, 2000);
+        }
+
+        function togglePeel() {
+            const guide = document.getElementById('peel-guide');
+            const isHidden = guide.classList.contains('hidden');
+            if(isHidden) {
+                guide.classList.remove('hidden');
+                guide.classList.add('grid');
+            } else {
+                guide.classList.add('hidden');
+                guide.classList.remove('grid');
+            }
         }
 
     </script>
