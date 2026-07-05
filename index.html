@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Waiheke High School: AS92027 History Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -32,6 +33,22 @@
         /* Animations */
         @keyframes globe-spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes star-pulse { 0%, 100% { transform: scale(0.85); filter: drop-shadow(0 0 5px rgba(197,160,89,0.5)); opacity: 0.9; } 50% { transform: scale(1.1); filter: drop-shadow(0 0 15px rgba(253,224,71,0.9)); opacity: 1; } }
+
+        @keyframes breathe {
+            0% { transform: scale(0.8); opacity: 0.6; }
+            40% { transform: scale(1.5); opacity: 1; }
+            60% { transform: scale(1.5); opacity: 1; }
+            100% { transform: scale(0.8); opacity: 0.6; }
+        }
+        .breathe-circle { animation: breathe 12s infinite ease-in-out; }
+        .tabular-nums { font-variant-numeric: tabular-nums; }
+
+        @keyframes levelUpAnim {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.2); filter: brightness(1.5); text-shadow: 0 0 10px #c5a059; }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        .level-up { animation: levelUpAnim 1s ease-out; }
 
         /* Component Styles */
         .glass-card { box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06); transition: background-color 0.3s, border-color 0.3s; }
@@ -64,6 +81,7 @@
         
         .question-btn { border: 2px solid transparent; transition: all 0.2s; }
         .question-btn.active { border-color: var(--whs-gold); background-color: #fefce8; color: #854d0e; }
+        .dark .question-btn.active { border-color: var(--whs-gold); background-color: rgba(139, 101, 8, 0.2); color: #fde047; }
         
         .quiz-option { border: 2px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; cursor: pointer; transition: all 0.2s; font-weight: 600; }
         .quiz-option:hover { background-color: #f1f5f9; border-color: #cbd5e1; }
@@ -80,9 +98,9 @@
 
     <div class="max-w-7xl mx-auto p-4 md:p-8">
         
-        <!-- HEADER -->
-        <header class="bg-whs-dark rounded-lg p-6 md:p-10 text-white mb-6 shadow-lg relative overflow-hidden flex flex-col md:flex-row justify-between items-center gap-6">
-            <div class="relative z-10 flex flex-col md:flex-row items-center gap-6 text-center md:text-left w-full">
+        <!-- HEADER w/ GAMIFICATION -->
+        <header class="bg-whs-dark rounded-lg p-6 md:p-8 text-white mb-6 shadow-lg relative overflow-hidden flex flex-col xl:flex-row justify-between items-center gap-6">
+            <div class="relative z-10 flex flex-col md:flex-row items-center gap-6 text-center md:text-left w-full xl:w-auto">
                 <div class="relative flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#10b981]/20 to-white/10 backdrop-blur-md rounded-2xl shadow-lg border border-white/30 shrink-0 group overflow-hidden">
                     <div class="absolute inset-0 bg-[#c5a059] blur-[20px] opacity-20 group-hover:opacity-40 transition duration-700"></div>
                     <div class="relative z-10 flex items-center justify-center">
@@ -104,19 +122,43 @@
                     </div>
                 </div>
                 <div class="flex-1">
-                    <h1 class="text-3xl md:text-5xl font-extrabold tracking-tight mb-1">Waiheke High School</h1>
-                    <h2 class="text-xl md:text-2xl font-normal opacity-90">NCEA Level 1 History (AS92027) Dashboard</h2>
-                    <div class="mt-3 inline-block bg-white text-whs-dark px-4 py-1.5 border border-transparent text-xs font-bold uppercase tracking-widest shadow-sm rounded">The Occupation of Japan</div>
+                    <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-1">Waiheke High School</h1>
+                    <h2 class="text-lg md:text-xl font-normal text-blue-200">NCEA Level 1 History (AS92027) Dashboard</h2>
+                    <div class="mt-2 inline-block bg-white text-whs-dark px-3 py-1 border border-transparent text-[10px] md:text-xs font-bold uppercase tracking-widest shadow-sm rounded">The Occupation of Japan</div>
                 </div>
-                
+            </div>
+
+            <!-- Gamification Panel -->
+            <div class="relative z-10 flex flex-wrap items-center gap-3 w-full xl:w-auto justify-center xl:justify-end">
                 <!-- Dark Mode Toggle -->
-                <button onclick="toggleDarkMode()" aria-label="Toggle Dark Mode" class="p-3 bg-white/10 hover:bg-white/20 rounded-full transition border border-white/20 backdrop-blur shrink-0">
-                    <!-- Sun Icon (shows in dark mode) -->
+                <button onclick="toggleDarkMode()" aria-label="Toggle Dark Mode" class="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition border border-white/20 backdrop-blur shrink-0">
                     <svg id="theme-sun" class="w-6 h-6 text-yellow-300 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    <!-- Moon Icon (shows in light mode) -->
                     <svg id="theme-moon" class="w-6 h-6 text-slate-200 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                 </button>
+
+                <!-- Exam Countdown -->
+                <div class="bg-blue-900/50 border border-blue-400/30 p-2 md:p-3 rounded-xl text-center shadow-inner">
+                    <div class="text-[10px] uppercase tracking-widest text-blue-200 font-bold" id="exam-date-label">Exam Date</div>
+                    <div class="text-sm md:text-lg font-black text-white" id="exam-countdown">Calculating...</div>
+                </div>
+
+                <!-- XP Tracker -->
+                <div class="bg-black/20 backdrop-blur-sm border border-white/20 p-2 md:p-3 rounded-xl text-center shadow-inner min-w-[90px]" id="xp-container">
+                    <div class="text-[10px] uppercase tracking-widest text-blue-200 font-bold mb-1">Rank</div>
+                    <div class="text-lg md:text-xl font-black text-[#c5a059] leading-none">Lvl <span id="level-display">1</span></div>
+                    <div class="text-[9px] md:text-[10px] text-blue-100 mt-1"><span id="xp-display">0</span> XP</div>
+                </div>
+
+                <!-- Streak Tracker -->
+                <div class="bg-black/20 backdrop-blur-sm border border-white/20 p-2 md:p-3 rounded-xl text-center shadow-inner min-w-[90px]">
+                    <div class="text-[10px] uppercase tracking-widest text-blue-200 font-bold mb-1">Streak</div>
+                    <div class="text-lg md:text-xl font-black text-[#c5a059] flex items-center justify-center gap-1 leading-none">
+                        🔥 <span id="streak-counter">0</span>
+                    </div>
+                    <div class="text-[9px] md:text-[10px] text-blue-100 mt-1">Days</div>
+                </div>
             </div>
+
             <!-- Background Graphic -->
             <svg class="absolute right-0 top-0 h-full w-64 text-white/5 transform translate-x-1/4 -translate-y-1/4 scale-150 pointer-events-none" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v4h-2zm0 6h2v2h-2zm-4-6h2v4H7zm0 6h2v2H7zm8-6h2v4h-2zm0 6h2v2h-2z" opacity="0.5"/><circle cx="12" cy="12" r="3" /><path d="M12 7l-3 4h6zM7 12l4 3v-6zM17 12l-4-3v6zM12 17l3-4H9z" opacity="0.8"/></svg>
         </header>
@@ -131,6 +173,7 @@
             <button class="nav-btn text-whs-goldtext font-bold" data-action="view" data-target="feedback">Sandbox</button>
             <button class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="exemplars">Exemplars</button>
             <button class="nav-btn text-emerald-600 dark:text-emerald-400 font-bold" data-action="view" data-target="practice">Practice Hub</button>
+            <button class="nav-btn text-rose-600 dark:text-rose-400 font-bold" data-action="view" data-target="wellbeing">💚 Wellbeing</button>
         </nav>
 
         <!-- MAIN VIEWS -->
@@ -268,7 +311,7 @@
                 </div>
             </div>
 
-            <!-- VIEW 2.5: PRIMARY SOURCES (NEW) -->
+            <!-- VIEW 2.5: PRIMARY SOURCES -->
             <div id="view-sources" class="hidden space-y-8 animate-in fade-in duration-500">
                 <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Primary Sources</h2>
@@ -318,7 +361,6 @@
                         <div class="stage-header mb-6"><span class="stage-number-badge">1</span> Interactive Timeline: August 1945</div>
                         
                         <div class="flex overflow-x-auto gap-4 pb-6 pt-2 snap-x px-2 custom-scrollbar" id="timeline-buttons">
-                            <!-- JS will toggle active class -->
                             <button onclick="showTimeline('jul26', this)" class="timeline-btn active shrink-0 shadow-md">July 26</button>
                             <button onclick="showTimeline('aug6', this)" class="timeline-btn shrink-0">Aug 6</button>
                             <button onclick="showTimeline('aug8', this)" class="timeline-btn shrink-0">Aug 8</button>
@@ -331,7 +373,6 @@
 
                         <!-- Timeline Display Area -->
                         <div id="timeline-display" class="bg-blue-50 dark:bg-slate-900 p-6 rounded-lg border border-blue-200 dark:border-slate-700 shadow-inner min-h-[140px] flex items-center transition-opacity duration-300">
-                            <!-- Default Content -->
                             <div>
                                 <h4 class="text-xl font-black text-whs-dark dark:text-blue-400 mb-2">July 26, 1945: The Potsdam Declaration</h4>
                                 <p class="text-slate-700 dark:text-slate-300 font-medium leading-relaxed">The US, UK, and China issue the Potsdam Declaration, demanding the unconditional surrender of all Japanese armed forces. It explicitly threatens "prompt and utter destruction" if Japan refuses.</p>
@@ -513,16 +554,19 @@
             <div id="view-feedback" class="hidden space-y-8 animate-in fade-in duration-500">
                 <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Writing Sandbox</h2>
-                    <p class="text-slate-600 dark:text-slate-400">Select a prompt, draft your paragraph, and get instant evidence analysis.</p>
+                    <p class="text-slate-600 dark:text-slate-400 mb-4">Select a prompt, draft your paragraph, and get instant evidence analysis.</p>
+                    <div class="flex justify-center gap-4 flex-wrap">
+                        <button onclick="toggleTimer()" id="exam-timer-btn" class="px-6 py-2 bg-slate-800 dark:bg-slate-700 text-white font-bold rounded-lg shadow-sm border border-slate-700 transition flex items-center gap-2">
+                            ⏱️ Exam Timer: <span id="timer-display" class="tabular-nums font-mono text-lg">50:00</span>
+                        </button>
+                        <a href="https://gemini.google.com/gem/1tF-2gLV2yFNWmEMZjYCVRwvqztIKuwYP?usp=sharing" target="_blank" class="px-6 py-2 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold rounded-lg shadow-sm border border-purple-200 flex items-center gap-2 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Get AI Tutor Feedback ↗
+                        </a>
+                    </div>
                 </div>
 
                 <div class="max-w-6xl mx-auto mb-6 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
-                    <div class="flex justify-between items-center mb-3">
-                        <span class="text-xs font-bold uppercase tracking-widest text-whs-dark dark:text-blue-400 block">Select a Question to Answer:</span>
-                        <a href="https://gemini.google.com/gem/1tF-2gLV2yFNWmEMZjYCVRwvqztIKuwYP?usp=sharing" target="_blank" class="px-3 py-1 bg-purple-100 hover:bg-purple-200 text-purple-800 text-[10px] font-bold rounded shadow-sm border border-purple-200 flex items-center gap-1 transition">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Get Detailed AI Feedback ↗
-                        </a>
-                    </div>
+                    <span class="text-xs font-bold uppercase tracking-widest text-whs-dark dark:text-blue-400 block mb-3">Select a Question to Answer:</span>
                     <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-2">
                         <button class="question-btn active p-3 text-left rounded-lg text-xs font-semibold bg-[#fefce8] border-whs-gold text-[#854d0e] dark:bg-yellow-900/30 dark:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/50" onclick="setSandboxQuestion(0, this)">1: Identify an individual or group. What was their perspective?</button>
                         <button class="question-btn p-3 text-left rounded-lg text-xs font-semibold bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800" onclick="setSandboxQuestion(1, this)">2: How did ONE action demonstrate this perspective?</button>
@@ -633,7 +677,7 @@
                 <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Grade Exemplars</h2>
                     <p class="text-slate-600 dark:text-slate-400 mb-2">See the exact difference between Not Achieved, Achieved, Merit, and Excellence paragraphs.</p>
-                    <a href="https://www.nzqa.govt.nz/ncea/assessment/search.do?query=History&view=exams&level=01&_gl=1*1mefmbf*_ga*MTU2NDA5MzUxMi4xNzczOTUxOTU0*_ga_TFQQ681L2E*czE3ODMyMzU2OTkkbzIwJGcxJHQxNzgzMjM1NzEyJGo0NyRsMCRoMA.." target="_blank" class="inline-block mt-2 px-4 py-2 bg-blue-50 text-[#002066] hover:bg-blue-100 border border-blue-200 rounded-lg font-bold text-sm transition shadow-sm">View Official NZQA Exemplars ↗</a>
+                    <a href="https://www.nzqa.govt.nz/ncea/assessment/search.do?query=History&view=exams&level=01&_gl=1*1mefmbf*_ga*MTU2NDA5MzUxMi4xNzczOTUxOTU0*_ga_TFQQ681L2E*czE3ODMyMzU2OTkkbzIwJGcxJHQxNzgzMjM1NzEyJGo0NyRsMCRoMA.." target="_blank" class="inline-flex items-center gap-1 mt-2 px-4 py-2 bg-blue-50 text-[#002066] hover:bg-blue-100 border border-blue-200 rounded-lg font-bold text-sm transition shadow-sm">View Official NZQA Exemplars ↗</a>
                 </div>
 
                 <div class="max-w-5xl mx-auto space-y-6">
@@ -694,68 +738,142 @@
                 <div class="text-center max-w-3xl mx-auto mb-6">
                     <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Vault Practice Hub</h2>
                     <p class="text-slate-600 dark:text-slate-400">Test your knowledge of the specific details required for the exam.</p>
-                    <a href="https://gemini.google.com/gem/1tF-2gLV2yFNWmEMZjYCVRwvqztIKuwYP?usp=sharing" target="_blank" class="inline-block mt-2 px-4 py-2 bg-purple-100 text-purple-800 hover:bg-purple-200 border border-purple-200 rounded-lg font-bold text-sm transition shadow-sm">Get Detailed AI Feedback on Practice Answers ↗</a>
+                    <a href="https://gemini.google.com/gem/1tF-2gLV2yFNWmEMZjYCVRwvqztIKuwYP?usp=sharing" target="_blank" class="inline-flex items-center gap-1 mt-2 px-4 py-2 bg-purple-100 text-purple-800 hover:bg-purple-200 border border-purple-200 rounded-lg font-bold text-sm transition shadow-sm">Get Detailed AI Feedback on Practice Answers ↗</a>
                 </div>
 
-                <div class="flex justify-center mb-6">
-                    <div class="bg-slate-200 dark:bg-slate-700 p-1 rounded-lg flex shadow-inner">
-                        <button id="toggle-quiz" class="px-6 py-2 rounded-md font-bold text-sm bg-white dark:bg-slate-900 text-whs-dark dark:text-blue-400 shadow-sm transition" onclick="setPracticeMode('quiz')">Random Quiz</button>
-                        <button id="toggle-flash" class="px-6 py-2 rounded-md font-bold text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition" onclick="setPracticeMode('flash')">Flashcards</button>
-                    </div>
-                </div>
-
-                <!-- Quiz Container -->
-                <div id="quiz-mode-container" class="glass-card p-6 md:p-10 border-t-4 border-t-[#10b981] max-w-3xl mx-auto shadow-sm bg-white dark:bg-slate-800 rounded-xl block">
-                    <div id="quiz-container">
-                        <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-slate-700 pb-4">
-                            <span class="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400" id="quiz-progress">Question 1 of 5</span>
-                            <span class="text-sm font-bold bg-[#10b981] text-white px-3 py-1 rounded-full shadow-sm" id="quiz-score">Score: 0</span>
-                        </div>
-                        
-                        <h3 class="text-2xl font-black text-whs-dark dark:text-white mb-6" id="quiz-question">Loading...</h3>
-                        
-                        <div class="space-y-3" id="quiz-options">
-                            <!-- Options injected via JS -->
+                <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <!-- Column 1: Mode Switches -->
+                    <div class="lg:col-span-2">
+                        <div class="flex justify-center mb-6">
+                            <div class="bg-slate-200 dark:bg-slate-700 p-1 rounded-lg flex shadow-inner">
+                                <button id="toggle-quiz" class="px-6 py-2 rounded-md font-bold text-sm bg-white dark:bg-slate-900 text-whs-dark dark:text-blue-400 shadow-sm transition" onclick="setPracticeMode('quiz')">Random Quiz</button>
+                                <button id="toggle-flash" class="px-6 py-2 rounded-md font-bold text-sm text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 transition" onclick="setPracticeMode('flash')">Flashcards</button>
+                            </div>
                         </div>
 
-                        <div class="mt-8 hidden" id="quiz-feedback-container">
-                            <p class="p-4 rounded-lg font-medium text-sm mb-4" id="quiz-explanation"></p>
-                            <button id="quiz-next-btn" class="w-full py-3 bg-whs-dark hover:bg-blue-800 text-white font-bold rounded-lg transition shadow-md">Next Question ➔</button>
-                        </div>
-                    </div>
-                    
-                    <!-- Quiz Results Screen -->
-                    <div class="text-center hidden" id="quiz-results">
-                        <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-2">Quiz Complete!</h2>
-                        <p class="text-xl text-slate-600 dark:text-slate-400 mb-6">You scored <span id="final-score" class="font-black text-whs-gold">0/5</span></p>
-                        <div id="results-message" class="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg mb-8 text-slate-700 dark:text-slate-300 font-medium"></div>
-                        <button onclick="initQuiz()" class="px-8 py-3 bg-[#10b981] hover:bg-emerald-600 text-white font-bold rounded-lg transition shadow-md">Generate 5 New Questions</button>
-                    </div>
-                </div>
-
-                <!-- Flashcard Container -->
-                <div id="flash-mode-container" class="max-w-2xl mx-auto hidden">
-                    <div class="flex justify-between items-center mb-4 px-4">
-                        <span class="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400" id="flash-progress">Card 1</span>
-                        <span class="text-xs text-slate-400 font-medium italic">Click card to flip</span>
-                    </div>
-                    
-                    <div class="h-64 md:h-80 w-full mb-6">
-                        <div id="flashcard-element" class="flip-card w-full h-full" onclick="toggleFlip()">
-                            <div class="flip-card-inner shadow-lg">
-                                <div class="flip-card-front bg-slate-50 dark:bg-slate-800 border-whs-dark dark:border-blue-500">
-                                    <h3 class="text-3xl font-black text-center text-whs-dark dark:text-blue-300" id="flash-front-text">Front</h3>
+                        <!-- Quiz Container -->
+                        <div id="quiz-mode-container" class="glass-card p-6 md:p-10 border-t-4 border-t-[#10b981] mx-auto shadow-sm bg-white dark:bg-slate-800 rounded-xl block">
+                            <div id="quiz-container">
+                                <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-slate-700 pb-4">
+                                    <span class="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400" id="quiz-progress">Question 1 of 5</span>
+                                    <span class="text-sm font-bold bg-[#10b981] text-white px-3 py-1 rounded-full shadow-sm" id="quiz-score">Score: 0</span>
                                 </div>
-                                <div class="flip-card-back bg-whs-dark dark:bg-blue-900 border-whs-dark dark:border-blue-500">
-                                    <p class="text-xl font-medium text-center text-white" id="flash-back-text">Back</p>
+                                
+                                <h3 class="text-2xl font-black text-whs-dark dark:text-white mb-6" id="quiz-question">Loading...</h3>
+                                
+                                <div class="space-y-3" id="quiz-options">
+                                    <!-- Options injected via JS -->
                                 </div>
+
+                                <div class="mt-8 hidden" id="quiz-feedback-container">
+                                    <p class="p-4 rounded-lg font-medium text-sm mb-4" id="quiz-explanation"></p>
+                                    <button id="quiz-next-btn" class="w-full py-3 bg-whs-dark hover:bg-blue-800 text-white font-bold rounded-lg transition shadow-md">Next Question ➔</button>
+                                </div>
+                            </div>
+                            
+                            <!-- Quiz Results Screen -->
+                            <div class="text-center hidden" id="quiz-results">
+                                <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-2">Quiz Complete!</h2>
+                                <p class="text-xl text-slate-600 dark:text-slate-400 mb-6">You scored <span id="final-score" class="font-black text-whs-gold">0/5</span></p>
+                                <div id="results-message" class="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg mb-8 text-slate-700 dark:text-slate-300 font-medium"></div>
+                                <button onclick="initQuiz()" class="px-8 py-3 bg-[#10b981] hover:bg-emerald-600 text-white font-bold rounded-lg transition shadow-md">Generate 5 New Questions</button>
+                            </div>
+                        </div>
+
+                        <!-- Flashcard Container -->
+                        <div id="flash-mode-container" class="mx-auto hidden">
+                            <div class="flex justify-between items-center mb-4 px-4">
+                                <span class="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400" id="flash-progress">Card 1</span>
+                                <span class="text-xs text-slate-400 font-medium italic">Click card to flip</span>
+                            </div>
+                            
+                            <div class="h-64 md:h-80 w-full mb-6">
+                                <div id="flashcard-element" class="flip-card w-full h-full" onclick="toggleFlip()">
+                                    <div class="flip-card-inner shadow-lg">
+                                        <div class="flip-card-front bg-slate-50 dark:bg-slate-800 border-whs-dark dark:border-blue-500">
+                                            <h3 class="text-3xl font-black text-center text-whs-dark dark:text-blue-300" id="flash-front-text">Front</h3>
+                                        </div>
+                                        <div class="flip-card-back bg-whs-dark dark:bg-blue-900 border-whs-dark dark:border-blue-500">
+                                            <p class="text-xl font-medium text-center text-white" id="flash-back-text">Back</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="flex justify-between gap-4">
+                                <button onclick="prevCard()" class="flex-1 py-3 bg-white dark:bg-slate-800 border-2 border-whs-dark dark:border-blue-500 text-whs-dark dark:text-blue-400 font-bold rounded-lg transition hover:bg-blue-50 dark:hover:bg-slate-700 shadow-sm">⬅ Previous</button>
+                                <button onclick="nextCard()" class="flex-1 py-3 bg-whs-dark dark:bg-blue-600 hover:bg-blue-800 dark:hover:bg-blue-500 text-white font-bold rounded-lg transition shadow-sm">Next ➔</button>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="flex justify-between gap-4">
-                        <button onclick="prevCard()" class="flex-1 py-3 bg-white dark:bg-slate-800 border-2 border-whs-dark dark:border-blue-500 text-whs-dark dark:text-blue-400 font-bold rounded-lg transition hover:bg-blue-50 dark:hover:bg-slate-700 shadow-sm">⬅ Previous</button>
-                        <button onclick="nextCard()" class="flex-1 py-3 bg-whs-dark dark:bg-blue-600 hover:bg-blue-800 dark:hover:bg-blue-500 text-white font-bold rounded-lg transition shadow-sm">Next ➔</button>
+                    <!-- Column 2: Dashboard Sidebar -->
+                    <div class="flex flex-col gap-8">
+                        <!-- Analytics Chart -->
+                        <div class="glass-card p-6 border-t-4 border-t-blue-500 bg-white dark:bg-slate-800 rounded-xl h-[300px] flex flex-col">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">My Quiz Progress</h3>
+                                <span class="text-xs text-blue-600 dark:text-blue-400 font-bold">+50 XP / perfect</span>
+                            </div>
+                            <div class="chart-container h-full w-full relative flex-grow">
+                                <canvas id="quizChart"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- To-Do List -->
+                        <div class="glass-card p-6 border-t-4 border-t-emerald-500 bg-white dark:bg-slate-800 rounded-xl flex flex-col h-[350px]">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="text-lg font-bold text-slate-800 dark:text-slate-200">AS92027 Checklist</h3>
+                                <span class="text-xs text-emerald-600 dark:text-emerald-400 font-bold">+10 XP</span>
+                            </div>
+                            <div class="flex gap-2 mb-4">
+                                <input type="text" id="todo-input" placeholder="Add study task..." class="flex-grow p-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 focus:border-emerald-500 outline-none text-sm dark:text-white" onkeypress="if(event.key === 'Enter') addTodo()">
+                                <button onclick="addTodo()" class="bg-emerald-500 text-white px-3 py-2 rounded-lg font-bold hover:bg-emerald-600 transition shadow-sm">+</button>
+                            </div>
+                            <ul id="todo-list" class="flex-grow overflow-y-auto custom-scrollbar space-y-2 pr-2">
+                                <!-- Todos injected via JS -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW 9: WELLBEING (NEW) -->
+            <div id="view-wellbeing" class="hidden space-y-8 animate-in fade-in duration-500">
+                <div class="text-center max-w-3xl mx-auto mb-4 px-4">
+                    <h2 class="text-4xl font-black text-rose-600 dark:text-rose-400 mb-4">Take a Breath.</h2>
+                    <p class="text-slate-600 dark:text-slate-400">Exam stress is completely normal. Use these tools to reset your nervous system.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto items-center">
+                    
+                    <!-- Breathing Exercise -->
+                    <div class="glass-card p-10 h-[400px] flex flex-col items-center justify-center relative overflow-hidden bg-rose-50 dark:bg-rose-900/20 border-rose-200 dark:border-rose-800 rounded-xl">
+                        <h3 class="absolute top-6 text-sm font-bold uppercase tracking-widest text-rose-800 dark:text-rose-300">Box Breathing</h3>
+                        <p class="absolute top-12 text-xs text-rose-600 dark:text-rose-400 text-center w-full px-8">Inhale as the circle grows (4s) • Hold (4s) • Exhale as it shrinks (4s)</p>
+                        
+                        <div class="breathe-circle w-48 h-48 rounded-full bg-rose-300/50 dark:bg-rose-500/30 border-4 border-rose-400 dark:border-rose-500 mt-8"></div>
+                    </div>
+
+                    <!-- Overwhelm Support Links -->
+                    <div class="space-y-6 h-full flex flex-col">
+                        <div class="glass-card p-6 bg-slate-900 dark:bg-slate-800 text-white border-t-4 border-t-rose-500 rounded-xl flex-grow">
+                            <h3 class="text-lg font-bold mb-3 text-rose-200">Need to talk to someone?</h3>
+                            <ul class="space-y-4 text-sm">
+                                <li class="flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/10">
+                                    <span class="text-2xl">📞</span>
+                                    <div><strong class="text-base text-white">1737</strong><br><span class="text-slate-300 text-xs">Free call or text anytime</span></div>
+                                </li>
+                                <li class="flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/10">
+                                    <span class="text-2xl">💬</span>
+                                    <div><strong class="text-base text-white">Youthline: 0800 376 633</strong><br><span class="text-slate-300 text-xs">Or free text 234</span></div>
+                                </li>
+                                <li class="flex items-center gap-3 bg-white/5 p-3 rounded-lg border border-white/10">
+                                    <span class="text-2xl">🏫</span>
+                                    <div><strong class="text-base text-white">WHS Counselling</strong><br><span class="text-slate-300 text-xs">Drop into the Hauora Centre during school.</span></div>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -767,14 +885,275 @@
         </footer>
     </div>
 
+    <!-- AUDIO SYSTEM -->
     <script>
+        function playBeep(type) {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if(!AudioContext) return;
+            const ctx = new AudioContext();
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            
+            if(type === 'ding') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
+                gain.gain.setValueAtTime(0.3, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 0.3);
+            } else if (type === 'alarm') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(400, ctx.currentTime);
+                osc.frequency.setValueAtTime(600, ctx.currentTime + 0.2);
+                osc.frequency.setValueAtTime(400, ctx.currentTime + 0.4);
+                osc.frequency.setValueAtTime(600, ctx.currentTime + 0.6);
+                gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
+                osc.start(ctx.currentTime);
+                osc.stop(ctx.currentTime + 1.5);
+            }
+        }
+    </script>
+
+    <!-- CORE LOGIC -->
+    <script>
+        // --- Gamification Logic ---
+        let xp = parseInt(localStorage.getItem('whs_xp')) || 0;
+
+        function updateXPDisplay() {
+            let level = Math.floor(Math.sqrt(xp / 10)) + 1;
+            document.getElementById('xp-display').innerText = xp;
+            document.getElementById('level-display').innerText = level;
+        }
+
+        function addXP(amount) {
+            let oldLevel = Math.floor(Math.sqrt(xp / 10)) + 1;
+            xp += amount;
+            localStorage.setItem('whs_xp', xp);
+            let newLevel = Math.floor(Math.sqrt(xp / 10)) + 1;
+            
+            updateXPDisplay();
+            playBeep('ding');
+
+            if (newLevel > oldLevel) {
+                const container = document.getElementById('xp-container');
+                container.classList.add('level-up');
+                setTimeout(() => container.classList.remove('level-up'), 1000);
+            }
+        }
+
+        function initStreak() {
+            const today = new Date().toDateString();
+            let lastLogin = localStorage.getItem('whs_last_login');
+            let streak = parseInt(localStorage.getItem('whs_streak')) || 0;
+
+            if (lastLogin !== today) {
+                const yesterday = new Date(Date.now() - 86400000).toDateString();
+                if (lastLogin === yesterday) {
+                    streak++;
+                } else if (lastLogin !== null) {
+                    streak = 1; 
+                }
+                localStorage.setItem('whs_last_login', today);
+                localStorage.setItem('whs_streak', streak);
+            }
+            const counter = document.getElementById('streak-counter');
+            if(counter) counter.innerText = streak || 1;
+        }
+
+        function initCountdown() {
+            // Hardcoded Date: Wednesday 18th November 2026 9.30am
+            const targetDate = new Date("November 18, 2026 09:30:00");
+            const now = new Date();
+            const diffTime = targetDate - now;
+            
+            document.getElementById('exam-date-label').innerText = "Wed 18 Nov, 9:30am";
+            
+            if (diffTime > 0) {
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                document.getElementById('exam-countdown').innerText = `${diffDays} Days to go`;
+            } else {
+                document.getElementById('exam-countdown').innerText = `Exam Today!`;
+            }
+        }
+
+        // --- To-Do List Logic ---
+        function initTodos() { 
+            const todos = JSON.parse(localStorage.getItem('whs_history_todos'));
+            if (!todos || todos.length === 0) {
+                const defaultTodos = [
+                    { text: "Memorise 3 stats for US Perspective", done: false },
+                    { text: "Memorise 2 quotes from Hirohito", done: false },
+                    { text: "Score 100% on the Practice Quiz", done: false },
+                    { text: "Draft one Excellence-level paragraph", done: false }
+                ];
+                localStorage.setItem('whs_history_todos', JSON.stringify(defaultTodos));
+            }
+            renderTodos(); 
+        }
+
+        function renderTodos() {
+            const todos = JSON.parse(localStorage.getItem('whs_history_todos')) || [];
+            const list = document.getElementById('todo-list');
+            list.innerHTML = '';
+            todos.forEach((t, i) => {
+                list.innerHTML += `
+                <li class="flex justify-between items-center bg-slate-50 dark:bg-slate-700/50 p-2 md:p-3 rounded-lg border border-slate-200 dark:border-slate-600 transition ${t.done ? 'opacity-50' : ''}">
+                    <span class="text-sm ${t.done ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200 font-medium'}">${t.text}</span>
+                    <div class="flex gap-2 shrink-0">
+                        <button onclick="toggleTodo(${i})" class="text-xs font-bold px-2 py-1 rounded bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-600 ${t.done ? 'text-slate-600 dark:text-slate-400' : 'text-emerald-600 dark:text-emerald-400'}">${t.done ? 'Undo' : 'Done ✓'}</button>
+                        <button onclick="deleteTodo(${i})" class="text-xs font-bold px-2 py-1 rounded bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400">✕</button>
+                    </div>
+                </li>`;
+            });
+        }
+
+        function addTodo() {
+            const input = document.getElementById('todo-input');
+            const text = input.value.trim();
+            if (text) {
+                const todos = JSON.parse(localStorage.getItem('whs_history_todos')) || [];
+                todos.push({ text: text, done: false });
+                localStorage.setItem('whs_history_todos', JSON.stringify(todos));
+                input.value = '';
+                renderTodos();
+            }
+        }
+
+        function toggleTodo(index) {
+            const todos = JSON.parse(localStorage.getItem('whs_history_todos'));
+            todos[index].done = !todos[index].done;
+            localStorage.setItem('whs_history_todos', JSON.stringify(todos));
+            if(todos[index].done) addXP(10);
+            renderTodos();
+        }
+
+        function deleteTodo(index) {
+            const todos = JSON.parse(localStorage.getItem('whs_history_todos'));
+            todos.splice(index, 1);
+            localStorage.setItem('whs_history_todos', JSON.stringify(todos));
+            renderTodos();
+        }
+
+        // --- Exam Timer Logic (Sandbox) ---
+        let timerInterval = null;
+        let timeLeft = 3000; // 50 mins
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timeLeft/60).toString().padStart(2, '0');
+            const s = (timeLeft%60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${m}:${s}`;
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('exam-timer-btn');
+            if(timerInterval) {
+                clearInterval(timerInterval);
+                timerInterval = null;
+                btn.innerHTML = `⏱️ Paused: <span id="timer-display" class="tabular-nums font-mono text-lg">${document.getElementById('timer-display').innerText}</span>`;
+                btn.classList.remove('bg-rose-600', 'border-rose-500');
+                btn.classList.add('bg-amber-500', 'border-amber-400');
+            } else {
+                // If it's starting from zero, reset to 50
+                if (timeLeft <= 0) timeLeft = 3000;
+                
+                btn.classList.remove('bg-slate-800', 'bg-amber-500', 'border-slate-700', 'border-amber-400');
+                btn.classList.add('bg-rose-600', 'border-rose-500', 'animate-pulse');
+                
+                // Play starting beep
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if(AudioContext) {
+                    const ctx = new AudioContext();
+                    ctx.resume().then(() => playBeep('ding'));
+                }
+                
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    updateTimerDisplay();
+                    if(timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                        playBeep('alarm');
+                        btn.classList.remove('animate-pulse', 'bg-rose-600', 'border-rose-500');
+                        btn.classList.add('bg-slate-800', 'border-slate-700');
+                        btn.innerHTML = `⏱️ Time's Up!`;
+                        alert("Exam time is up! Pens down.");
+                    } else {
+                        btn.innerHTML = `⏱️ Running: <span id="timer-display" class="tabular-nums font-mono text-lg">${Math.floor(timeLeft/60).toString().padStart(2,'0')}:${(timeLeft%60).toString().padStart(2,'0')}</span>`;
+                    }
+                }, 1000);
+            }
+        }
+
+        // --- Chart.js Logic (Quiz Scores) ---
+        let quizChartInstance = null;
+
+        function initQuizChart() {
+            const canvas = document.getElementById('quizChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (quizChartInstance) quizChartInstance.destroy();
+
+            // Load last 7 scores or default
+            let scores = JSON.parse(localStorage.getItem('whs_quiz_scores')) || [0,0,0,0,0,0,0];
+            const labels = ['1','2','3','4','5','6','Latest'];
+            const isDark = document.documentElement.classList.contains('dark');
+            const textColor = isDark ? '#94a3b8' : '#475569';
+            const gridColor = isDark ? '#334155' : '#e2e8f0';
+
+            quizChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Score (out of 5)',
+                        data: scores,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                        borderWidth: 3,
+                        pointBackgroundColor: '#10b981',
+                        pointRadius: 4,
+                        fill: true,
+                        tension: 0.3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { min: 0, max: 5, ticks: { stepSize: 1, color: textColor }, grid: { color: gridColor } },
+                        x: { ticks: { color: textColor }, grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function updateQuizChart(newScore) {
+            let scores = JSON.parse(localStorage.getItem('whs_quiz_scores')) || [0,0,0,0,0,0,0];
+            scores.shift(); // remove oldest
+            scores.push(newScore); // add newest
+            localStorage.setItem('whs_quiz_scores', JSON.stringify(scores));
+            
+            if(quizChartInstance) {
+                quizChartInstance.data.datasets[0].data = scores;
+                quizChartInstance.update();
+            } else {
+                initQuizChart();
+            }
+        }
+
+
         // --- Dark Mode Logic ---
         function toggleDarkMode() {
             document.documentElement.classList.toggle('dark');
             const isDark = document.documentElement.classList.contains('dark');
             localStorage.setItem('whs_theme', isDark ? 'dark' : 'light');
+            setTimeout(initQuizChart, 50); // Redraw chart colors
         }
-        // Check saved theme on load
         if (localStorage.getItem('whs_theme') === 'dark' || (!('whs_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
             document.documentElement.classList.add('dark');
         }
@@ -786,7 +1165,7 @@
             
             var viewId = target.getAttribute('data-target');
             
-            ['standard', 'sources', 'perspectives', 'vault', 'blueprint', 'practice', 'feedback', 'exemplars'].forEach(function(v) {
+            ['standard', 'sources', 'perspectives', 'vault', 'blueprint', 'practice', 'feedback', 'exemplars', 'wellbeing'].forEach(function(v) {
                 var el = document.getElementById('view-' + v);
                 var btn = document.querySelector('[data-target="' + v + '"]');
                 if (el) { el.classList.remove('block'); el.classList.add('hidden'); }
@@ -797,6 +1176,10 @@
             var activeBtn = document.querySelector('[data-target="' + viewId + '"]');
             if (activeView) { activeView.classList.remove('hidden'); activeView.classList.add('block'); }
             if (activeBtn) activeBtn.classList.add('nav-active');
+
+            if(viewId === 'practice') {
+                setTimeout(initQuizChart, 100);
+            }
         });
 
         // --- Interactive Timeline Logic ---
@@ -844,7 +1227,7 @@
 
         let activeQuizPool = [];
         let currentQIndex = 0;
-        let score = 0;
+        let quizScore = 0;
 
         function setPracticeMode(mode) {
             const qBtn = document.getElementById('toggle-quiz');
@@ -881,7 +1264,7 @@
             activeQuizPool = shuffledPool.slice(0, 5); 
             
             currentQIndex = 0;
-            score = 0;
+            quizScore = 0;
             document.getElementById('quiz-results').classList.add('hidden');
             document.getElementById('quiz-container').classList.remove('hidden');
             loadQuestion();
@@ -890,7 +1273,7 @@
         function loadQuestion() {
             const q = activeQuizPool[currentQIndex];
             document.getElementById('quiz-progress').innerText = `Question ${currentQIndex + 1} of 5`;
-            document.getElementById('quiz-score').innerText = `Score: ${score}`;
+            document.getElementById('quiz-score').innerText = `Score: ${quizScore}`;
             document.getElementById('quiz-question').innerText = q.q;
             document.getElementById('quiz-feedback-container').classList.add('hidden');
             
@@ -913,8 +1296,8 @@
 
             if (selectedIndex === q.ans) {
                 btnElement.classList.add('correct');
-                score++;
-                document.getElementById('quiz-score').innerText = `Score: ${score}`;
+                quizScore++;
+                document.getElementById('quiz-score').innerText = `Score: ${quizScore}`;
             } else {
                 btnElement.classList.add('incorrect');
                 allOptions[q.ans].classList.add('correct'); 
@@ -942,14 +1325,19 @@
             const resultsScreen = document.getElementById('quiz-results');
             resultsScreen.classList.remove('hidden');
             
-            document.getElementById('final-score').innerText = `${score}/5`;
+            document.getElementById('final-score').innerText = `${quizScore}/5`;
             
             let message = "";
-            if (score === 5) message = "Perfect! You know the Evidence Vault inside and out. You are ready for Excellence.";
-            else if (score >= 3) message = "Good job! You have a solid grasp of the facts, but review the Vault one more time to lock in the details.";
+            if (quizScore === 5) {
+                message = "Perfect! You know the Evidence Vault inside and out. You are ready for Excellence.";
+                addXP(50); // Reward max score
+            }
+            else if (quizScore >= 3) message = "Good job! You have a solid grasp of the facts, but review the Vault one more time to lock in the details.";
             else message = "Keep practicing! Specific evidence is required to pass. Study the Evidence Vault tab and try again.";
             
             document.getElementById('results-message').innerText = message;
+            
+            updateQuizChart(quizScore);
         }
 
         // --- Flashcard Logic ---
@@ -994,6 +1382,7 @@
         function nextCard() {
             currentCardIndex = (currentCardIndex + 1) % flashcardData.length;
             updateFlashcardUI();
+            if (currentCardIndex === 0) addXP(10); // Reward for cycling through all
         }
 
         function prevCard() {
@@ -1041,8 +1430,13 @@
 
         const textArea = document.getElementById('sandbox-text');
         
-        // Auto-save logic
         window.addEventListener('DOMContentLoaded', () => {
+            initStreak();
+            updateXPDisplay();
+            initTodos();
+            initCountdown();
+            initQuizChart();
+
             const savedDraft = localStorage.getItem('whs_draft_essay');
             if (savedDraft) {
                 textArea.value = savedDraft;
@@ -1057,7 +1451,6 @@
             const words = textArea.value.trim().split(/\s+/).filter(w => w.length > 0).length;
             document.getElementById('word-count').innerText = `${words} words`;
             
-            // Auto-save indication
             clearTimeout(typingTimer);
             typingTimer = setTimeout(() => {
                 localStorage.setItem('whs_draft_essay', textArea.value);
@@ -1066,6 +1459,8 @@
                 setTimeout(() => { ind.style.opacity = 0; }, 2000);
             }, 1500);
         });
+
+        let hasAwardedWritingXP = false;
 
         function analyzeText() {
             const rawText = textArea.value;
@@ -1104,25 +1499,28 @@
                 errorModule.classList.add('hidden');
             }
 
-            let score = 30; 
-            score += Math.min(foundNames.length * 10, 20); 
-            score += Math.min(foundDates.length * 10, 20); 
-            score += Math.min(foundConcepts.length * 15, 30); 
+            let analysisScore = 30; 
+            analysisScore += Math.min(foundNames.length * 10, 20); 
+            analysisScore += Math.min(foundDates.length * 10, 20); 
+            analysisScore += Math.min(foundConcepts.length * 15, 30); 
             
-            if (text.includes('cold war') || text.includes('meiji') || text.includes('soviet')) score += 10;
+            if (text.includes('cold war') || text.includes('meiji') || text.includes('soviet')) analysisScore += 10;
 
-            if (foundErrors.length > 0) score = Math.max(score - 20, 10);
+            if (foundErrors.length > 0) analysisScore = Math.max(analysisScore - 20, 10);
 
-            score = Math.min(score, 100);
+            analysisScore = Math.min(analysisScore, 100);
 
-            document.getElementById('strength-bar').style.width = `${score}%`;
-            document.getElementById('strength-bar').className = `h-3 rounded-full transition-all duration-1000 ${score > 79 ? 'bg-[#10b981]' : score > 49 ? 'bg-[#c5a059]' : 'bg-red-500'}`;
-            document.getElementById('strength-text').innerText = `${score}%`;
+            document.getElementById('strength-bar').style.width = `${analysisScore}%`;
+            document.getElementById('strength-bar').className = `h-3 rounded-full transition-all duration-1000 ${analysisScore > 79 ? 'bg-[#10b981]' : analysisScore > 49 ? 'bg-[#c5a059]' : 'bg-red-500'}`;
+            document.getElementById('strength-text').innerText = `${analysisScore}%`;
 
             let msg = "";
             if (foundErrors.length > 0) msg = "You have some good evidence, but double-check your facts! The AI detected a potential historical error in your writing (see above).";
-            else if (score >= 90) msg = "Excellent! You have woven together specific names, dates, and complex historical concepts perfectly. If you linked this to the wider context, this is an 'E' level paragraph.";
-            else if (score >= 60) msg = "Solid Merit level! You are using good evidence. Try adding one more exact statistic (like 1 Million) or connecting it to the Wider Context (Cold War/Meiji era) for Excellence.";
+            else if (analysisScore >= 90) {
+                msg = "Excellent! You have woven together specific names, dates, and complex historical concepts perfectly. If you linked this to the wider context, this is an 'E' level paragraph.";
+                if(!hasAwardedWritingXP) { addXP(100); hasAwardedWritingXP = true; }
+            }
+            else if (analysisScore >= 60) msg = "Solid Merit level! You are using good evidence. Try adding one more exact statistic (like 1 Million) or connecting it to the Wider Context (Cold War/Meiji era) for Excellence.";
             else msg = "Good start, but you need more specific evidence. Examiners want to see exact names, dates, and quotes. Check the Evidence Vault and try dropping two facts into your writing.";
 
             document.getElementById('feedback-message').innerText = msg;
@@ -1156,10 +1554,10 @@
             document.body.removeChild(tmp);
             
             btn.innerText = "Copied ✓";
-            btn.classList.add('bg-emerald-100', 'text-emerald-800');
+            btn.classList.add('bg-emerald-100', 'text-emerald-800', 'dark:bg-emerald-900', 'dark:text-emerald-300');
             setTimeout(() => {
                 btn.innerText = "Copy";
-                btn.classList.remove('bg-emerald-100', 'text-emerald-800');
+                btn.classList.remove('bg-emerald-100', 'text-emerald-800', 'dark:bg-emerald-900', 'dark:text-emerald-300');
             }, 2000);
         }
 
