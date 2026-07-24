@@ -83,15 +83,33 @@
         .question-btn.active { border-color: var(--whs-gold); background-color: #fefce8; color: #854d0e; }
         .dark .question-btn.active { border-color: var(--whs-gold); background-color: rgba(139, 101, 8, 0.2); color: #fde047; }
         
-        .quiz-option { border: 2px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; cursor: pointer; transition: all 0.2s; font-weight: 600; }
+        .quiz-option { display: flex; align-items: center; gap: 0.6rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; padding: 1rem; cursor: pointer; transition: all 0.2s; font-weight: 600; }
         .quiz-option:hover { background-color: #f1f5f9; border-color: #cbd5e1; }
         .quiz-option.correct { background-color: #d1fae5; border-color: #10b981; color: #047857; }
         .quiz-option.incorrect { background-color: #fee2e2; border-color: #ef4444; color: #b91c1c; }
         .quiz-option.disabled { pointer-events: none; opacity: 0.6; }
+        .quiz-option-icon { font-size: 1.1em; width: 1.1em; text-align: center; flex-shrink: 0; }
         .dark .quiz-option { border-color: #334155; }
         .dark .quiz-option:hover { background-color: #1e293b; border-color: #475569; }
         .dark .quiz-option.correct { background-color: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #34d399; }
         .dark .quiz-option.incorrect { background-color: rgba(239, 68, 68, 0.2); border-color: #ef4444; color: #f87171; }
+
+        /* Accessibility: visible keyboard focus everywhere */
+        :focus-visible {
+            outline: 3px solid #c5a059;
+            outline-offset: 2px;
+            border-radius: 2px;
+        }
+
+        /* Accessibility: respect reduced-motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.001ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-200">
@@ -104,7 +122,7 @@
                 <div class="relative flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-[#10b981]/20 to-white/10 backdrop-blur-md rounded-2xl shadow-lg border border-white/30 shrink-0 group overflow-hidden">
                     <div class="absolute inset-0 bg-[#c5a059] blur-[20px] opacity-20 group-hover:opacity-40 transition duration-700"></div>
                     <div class="relative z-10 flex items-center justify-center">
-                        <svg class="w-12 h-12 md:w-14 md:h-14 drop-shadow-xl" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg aria-hidden="true" focusable="false" class="w-12 h-12 md:w-14 md:h-14 drop-shadow-xl" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g style="transform-origin: center; animation: globe-spin 25s linear infinite;">
                                 <circle cx="50" cy="50" r="46" fill="#1e3a8a" />
                                 <path d="M 50 4 A 46 46 0 0 1 96 50 A 46 46 0 0 1 80 84 Q 70 60 50 60 Q 30 60 15 78 A 46 46 0 0 1 4 50 A 46 46 0 0 1 50 4 Z" fill="#10b981" opacity="0.8"/>
@@ -132,8 +150,8 @@
             <div class="relative z-10 flex flex-wrap items-center gap-3 w-full xl:w-auto justify-center xl:justify-end">
                 <!-- Dark Mode Toggle -->
                 <button onclick="toggleDarkMode()" aria-label="Toggle Dark Mode" class="p-3 bg-white/10 hover:bg-white/20 rounded-xl transition border border-white/20 backdrop-blur shrink-0">
-                    <svg id="theme-sun" class="w-6 h-6 text-yellow-300 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    <svg id="theme-moon" class="w-6 h-6 text-slate-200 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    <svg aria-hidden="true" focusable="false" id="theme-sun" class="w-6 h-6 text-yellow-300 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg aria-hidden="true" focusable="false" id="theme-moon" class="w-6 h-6 text-slate-200 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
                 </button>
 
                 <!-- Exam Countdown -->
@@ -160,26 +178,26 @@
             </div>
 
             <!-- Background Graphic -->
-            <svg class="absolute right-0 top-0 h-full w-64 text-white/5 transform translate-x-1/4 -translate-y-1/4 scale-150 pointer-events-none" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v4h-2zm0 6h2v2h-2zm-4-6h2v4H7zm0 6h2v2H7zm8-6h2v4h-2zm0 6h2v2h-2z" opacity="0.5"/><circle cx="12" cy="12" r="3" /><path d="M12 7l-3 4h6zM7 12l4 3v-6zM17 12l-4-3v6zM12 17l3-4H9z" opacity="0.8"/></svg>
+            <svg aria-hidden="true" focusable="false" class="absolute right-0 top-0 h-full w-64 text-white/5 transform translate-x-1/4 -translate-y-1/4 scale-150 pointer-events-none" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v4h-2zm0 6h2v2h-2zm-4-6h2v4H7zm0 6h2v2H7zm8-6h2v4h-2zm0 6h2v2h-2z" opacity="0.5"/><circle cx="12" cy="12" r="3" /><path d="M12 7l-3 4h6zM7 12l4 3v-6zM17 12l-4-3v6zM12 17l3-4H9z" opacity="0.8"/></svg>
         </header>
 
         <!-- NAVIGATION -->
-        <nav class="sticky top-0 z-50 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md flex items-center justify-start md:justify-center border-b-2 border-slate-300 dark:border-slate-700 mb-8 gap-1 md:gap-4 overflow-x-auto pb-3 pt-3 -mx-4 px-4 md:-mx-0 md:px-0 shadow-sm transition-all duration-300 custom-scrollbar">
-            <button class="nav-btn nav-active text-slate-600 dark:text-slate-400" data-action="view" data-target="standard">The Standard</button>
-            <button class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="perspectives">Perspectives</button>
-            <button class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="sources">Primary Sources</button>
-            <button class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="vault">Evidence Vault</button>
-            <button class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="blueprint">Blueprint</button>
-            <button class="nav-btn text-whs-goldtext font-bold" data-action="view" data-target="feedback">Sandbox</button>
-            <button class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="exemplars">Exemplars</button>
-            <button class="nav-btn text-emerald-600 dark:text-emerald-400 font-bold" data-action="view" data-target="practice">Practice Hub</button>
-            <button class="nav-btn text-rose-600 dark:text-rose-400 font-bold" data-action="view" data-target="wellbeing">💚 Wellbeing</button>
+        <nav role="tablist" aria-label="Dashboard sections" class="sticky top-0 z-50 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md flex items-center justify-start md:justify-center border-b-2 border-slate-300 dark:border-slate-700 mb-8 gap-1 md:gap-4 overflow-x-auto pb-3 pt-3 -mx-4 px-4 md:-mx-0 md:px-0 shadow-sm transition-all duration-300 custom-scrollbar">
+            <button id="tab-standard" role="tab" aria-selected="true" aria-controls="view-standard" class="nav-btn nav-active text-slate-600 dark:text-slate-400" data-action="view" data-target="standard">The Standard</button>
+            <button id="tab-perspectives" role="tab" aria-selected="false" aria-controls="view-perspectives" class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="perspectives">Perspectives</button>
+            <button id="tab-sources" role="tab" aria-selected="false" aria-controls="view-sources" class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="sources">Primary Sources</button>
+            <button id="tab-vault" role="tab" aria-selected="false" aria-controls="view-vault" class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="vault">Evidence Vault</button>
+            <button id="tab-blueprint" role="tab" aria-selected="false" aria-controls="view-blueprint" class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="blueprint">Blueprint</button>
+            <button id="tab-feedback" role="tab" aria-selected="false" aria-controls="view-feedback" class="nav-btn text-whs-goldtext font-bold" data-action="view" data-target="feedback">Sandbox</button>
+            <button id="tab-exemplars" role="tab" aria-selected="false" aria-controls="view-exemplars" class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="exemplars">Exemplars</button>
+            <button id="tab-practice" role="tab" aria-selected="false" aria-controls="view-practice" class="nav-btn text-emerald-600 dark:text-emerald-400 font-bold" data-action="view" data-target="practice">Practice Hub</button>
+            <button id="tab-wellbeing" role="tab" aria-selected="false" aria-controls="view-wellbeing" class="nav-btn text-rose-600 dark:text-rose-400 font-bold" data-action="view" data-target="wellbeing">💚 Wellbeing</button>
         </nav>
 
         <!-- MAIN VIEWS -->
         <main>
             <!-- VIEW 1: THE STANDARD -->
-            <div id="view-standard" class="space-y-8 animate-in fade-in duration-500 block">
+            <div id="view-standard" role="tabpanel" aria-labelledby="tab-standard" tabindex="0" class="space-y-8 animate-in fade-in duration-500 block">
                 <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Know Your Target</h2>
                     <p class="text-slate-600 dark:text-slate-400">Understand exactly what the examiners (and the Chief Marker) are looking for.</p>
@@ -189,7 +207,7 @@
                     <!-- Chief Marker Note -->
                     <div class="mb-8 p-5 bg-orange-50 dark:bg-slate-700/50 border border-orange-200 dark:border-slate-600 rounded-lg shadow-sm">
                         <h4 class="text-sm font-black text-whs-dark dark:text-blue-300 uppercase tracking-widest mb-3 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
+                            <svg aria-hidden="true" focusable="false" class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z"></path></svg>
                             NZQA Chief Marker Advice
                         </h4>
                         <p class="text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed">Choosing a specific, well-defined historical context is crucial. Candidates should focus on the <strong>"why"</strong> (motivations and beliefs) rather than simply providing a chronological narrative of "what" happened. Discussing multiple, specific actions allows candidates to provide a much more detailed explanation of why individuals or groups responded the way they did.</p>
@@ -205,9 +223,9 @@
                                 <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Identify & Describe</h3>
                                 <p class="text-slate-600 dark:text-slate-400 mb-4 font-medium">Candidates successfully described two perspectives and their corresponding actions or responses using relevant historical evidence.</p>
                                 <ul class="space-y-3 text-sm text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-700">
-                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Identify:</strong> Name the perspective clearly (e.g., The US Administration).</span></li>
-                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Describe Action:</strong> What did they actually do? (e.g., Dropped the atomic bombs).</span></li>
-                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Provide Evidence:</strong> Include a basic fact, quote, or date.</span></li>
+                                    <li class="flex gap-3 items-start"><svg aria-hidden="true" focusable="false" class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Identify:</strong> Name the perspective clearly (e.g., The US Administration).</span></li>
+                                    <li class="flex gap-3 items-start"><svg aria-hidden="true" focusable="false" class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Describe Action:</strong> What did they actually do? (e.g., Dropped the atomic bombs).</span></li>
+                                    <li class="flex gap-3 items-start"><svg aria-hidden="true" focusable="false" class="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Provide Evidence:</strong> Include a basic fact, quote, or date.</span></li>
                                 </ul>
                             </div>
                         </div>
@@ -221,9 +239,9 @@
                                 <h3 class="text-xl font-bold text-slate-800 dark:text-white mb-2">Explain & Compare</h3>
                                 <p class="text-slate-600 dark:text-slate-400 mb-4 font-medium">Candidates explained the perspectives and actions, detailed the differences between them, and supported this with relevant evidence.</p>
                                 <ul class="space-y-3 text-sm text-slate-700 dark:text-slate-300 bg-slate-50 dark:bg-slate-900/50 p-5 rounded-lg border border-slate-100 dark:border-slate-700">
-                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Explain Motivations:</strong> Why did they take this action? Focus on deep beliefs over simple narrative.</span></li>
-                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Compare:</strong> Explicitly state how and why Perspective A is fundamentally different from Perspective B.</span></li>
-                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Use Specific Evidence:</strong> Quote historical figures, use exact statistics, and integrate them into your sentences.</span></li>
+                                    <li class="flex gap-3 items-start"><svg aria-hidden="true" focusable="false" class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Explain Motivations:</strong> Why did they take this action? Focus on deep beliefs over simple narrative.</span></li>
+                                    <li class="flex gap-3 items-start"><svg aria-hidden="true" focusable="false" class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Compare:</strong> Explicitly state how and why Perspective A is fundamentally different from Perspective B.</span></li>
+                                    <li class="flex gap-3 items-start"><svg aria-hidden="true" focusable="false" class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Use Specific Evidence:</strong> Quote historical figures, use exact statistics, and integrate them into your sentences.</span></li>
                                 </ul>
                             </div>
                         </div>
@@ -238,9 +256,9 @@
                                 <h3 class="text-xl font-bold text-whs-dark dark:text-blue-300 mb-2">Examine & Connect</h3>
                                 <p class="text-slate-600 dark:text-slate-400 mb-4 font-medium">Candidates discussed the perspectives and actions, deeply analyzed how or why they differed, and incorporated the wider historical context to fully develop their explanation.</p>
                                 <ul class="space-y-3 text-sm text-whs-dark dark:text-blue-100 font-semibold bg-orange-50 dark:bg-blue-900/20 p-5 rounded-lg border border-whs-gold dark:border-blue-500/50 shadow-inner">
-                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-whs-gold dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Wider Context:</strong> Connect their actions to deeper motives or broader global shifts (e.g., The beginning of the Cold War, or the Meiji military tradition).</span></li>
-                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-whs-gold dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Evidence Leads:</strong> Your entire argument is built around complex evidence. Evidence proves the point, rather than just being tacked on.</span></li>
-                                    <li class="flex gap-3 items-start"><svg class="w-5 h-5 text-whs-gold dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Insightful Examination:</strong> Show deep understanding of the complexity and nuances of their beliefs.</span></li>
+                                    <li class="flex gap-3 items-start"><svg aria-hidden="true" focusable="false" class="w-5 h-5 text-whs-gold dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Wider Context:</strong> Connect their actions to deeper motives or broader global shifts (e.g., The beginning of the Cold War, or the Meiji military tradition).</span></li>
+                                    <li class="flex gap-3 items-start"><svg aria-hidden="true" focusable="false" class="w-5 h-5 text-whs-gold dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Evidence Leads:</strong> Your entire argument is built around complex evidence. Evidence proves the point, rather than just being tacked on.</span></li>
+                                    <li class="flex gap-3 items-start"><svg aria-hidden="true" focusable="false" class="w-5 h-5 text-whs-gold dark:text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> <span><strong>Insightful Examination:</strong> Show deep understanding of the complexity and nuances of their beliefs.</span></li>
                                 </ul>
                             </div>
                         </div>
@@ -249,7 +267,7 @@
             </div>
 
             <!-- VIEW 2: PERSPECTIVES -->
-            <div id="view-perspectives" class="hidden space-y-8 animate-in fade-in duration-500">
+            <div id="view-perspectives" role="tabpanel" aria-labelledby="tab-perspectives" tabindex="0" class="hidden space-y-8 animate-in fade-in duration-500">
                 <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Perspective Explorer</h2>
                     <p class="text-slate-600 dark:text-slate-400">Compare the core values, beliefs, and motivations of the two sides.</p>
@@ -312,7 +330,7 @@
             </div>
 
             <!-- VIEW 2.5: PRIMARY SOURCES -->
-            <div id="view-sources" class="hidden space-y-8 animate-in fade-in duration-500">
+            <div id="view-sources" role="tabpanel" aria-labelledby="tab-sources" tabindex="0" class="hidden space-y-8 animate-in fade-in duration-500">
                 <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Primary Sources</h2>
                     <p class="text-slate-600 dark:text-slate-400">Read and quote from the exact historical documents that shaped August 1945.</p>
@@ -349,7 +367,7 @@
             </div>
 
             <!-- VIEW 3: EVIDENCE VAULT -->
-            <div id="view-vault" class="hidden space-y-8 animate-in fade-in duration-500">
+            <div id="view-vault" role="tabpanel" aria-labelledby="tab-vault" tabindex="0" class="hidden space-y-8 animate-in fade-in duration-500">
                 <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">The Evidence Vault</h2>
                     <p class="text-slate-600 dark:text-slate-400">Incorporate these specific details into your essay to secure high grades.</p>
@@ -466,7 +484,7 @@
             </div>
 
             <!-- VIEW 4: BLUEPRINT -->
-            <div id="view-blueprint" class="hidden space-y-8 animate-in fade-in duration-500">
+            <div id="view-blueprint" role="tabpanel" aria-labelledby="tab-blueprint" tabindex="0" class="hidden space-y-8 animate-in fade-in duration-500">
                 <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Excellence Blueprint</h2>
                     <p class="text-slate-600 dark:text-slate-400">How to structure your essay and include the Wider Context to get an 'E'.</p>
@@ -481,7 +499,7 @@
                                 Wider Context
                                 <span class="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-64 p-3 bg-slate-900 dark:bg-black text-white text-xs font-normal rounded-lg opacity-0 group-hover:opacity-100 transition shadow-xl pointer-events-none z-50 normal-case tracking-normal">
                                     The overarching historical landscape (e.g., the impending Cold War, or the 70-year tradition of Meiji military dominance). Connecting to this shows deep understanding.
-                                    <svg class="absolute text-slate-900 dark:text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
+                                    <svg aria-hidden="true" focusable="false" class="absolute text-slate-900 dark:text-black h-2 w-full left-0 top-full" x="0px" y="0px" viewBox="0 0 255 255"><polygon class="fill-current" points="0,0 127.5,127.5 255,0"/></svg>
                                 </span>
                             </span>
                         </h3>
@@ -551,7 +569,7 @@
             </div>
 
             <!-- VIEW 5: WRITING SANDBOX -->
-            <div id="view-feedback" class="hidden space-y-8 animate-in fade-in duration-500">
+            <div id="view-feedback" role="tabpanel" aria-labelledby="tab-feedback" tabindex="0" class="hidden space-y-8 animate-in fade-in duration-500">
                 <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Writing Sandbox</h2>
                     <p class="text-slate-600 dark:text-slate-400 mb-4">Select a prompt, draft your paragraph, and get instant evidence analysis.</p>
@@ -560,7 +578,7 @@
                             ⏱️ Exam Timer: <span id="timer-display" class="tabular-nums font-mono text-lg">50:00</span>
                         </button>
                         <a href="https://gemini.google.com/gem/1tF-2gLV2yFNWmEMZjYCVRwvqztIKuwYP?usp=sharing" target="_blank" class="px-6 py-2 bg-purple-100 hover:bg-purple-200 text-purple-800 font-bold rounded-lg shadow-sm border border-purple-200 flex items-center gap-2 transition">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Get AI Tutor Feedback ↗
+                            <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Get AI Tutor Feedback ↗
                         </a>
                     </div>
                 </div>
@@ -651,7 +669,7 @@
                                 <!-- NLP Fact Check Module -->
                                 <div id="fact-check-module" class="hidden mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
                                     <h4 class="text-xs font-bold uppercase tracking-widest text-red-600 dark:text-red-400 mb-2 flex items-center gap-1">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                                        <svg aria-hidden="true" focusable="false" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
                                         Possible Factual Errors:
                                     </h4>
                                     <ul id="found-errors" class="text-xs text-red-700 dark:text-red-400 font-medium space-y-2 pl-4 list-disc">
@@ -665,7 +683,7 @@
                         </div>
                         
                         <div id="analysis-placeholder" class="text-center py-10 text-slate-400">
-                            <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            <svg aria-hidden="true" focusable="false" class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                             <p class="text-sm font-bold">Write your paragraph and click Analyse to see your score.</p>
                         </div>
                     </div>
@@ -673,7 +691,7 @@
             </div>
 
             <!-- VIEW 6: EXEMPLARS -->
-            <div id="view-exemplars" class="hidden space-y-8 animate-in fade-in duration-500">
+            <div id="view-exemplars" role="tabpanel" aria-labelledby="tab-exemplars" tabindex="0" class="hidden space-y-8 animate-in fade-in duration-500">
                 <div class="text-center max-w-3xl mx-auto mb-8">
                     <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Grade Exemplars</h2>
                     <p class="text-slate-600 dark:text-slate-400 mb-2">See the exact difference between Not Achieved, Achieved, Merit, and Excellence paragraphs.</p>
@@ -734,7 +752,7 @@
             </div>
 
             <!-- VIEW 8: PRACTICE HUB (QUIZ & FLASHCARDS) -->
-            <div id="view-practice" class="hidden space-y-8 animate-in fade-in duration-500">
+            <div id="view-practice" role="tabpanel" aria-labelledby="tab-practice" tabindex="0" class="hidden space-y-8 animate-in fade-in duration-500">
                 <div class="text-center max-w-3xl mx-auto mb-6">
                     <h2 class="text-4xl font-black text-slate-900 dark:text-white mb-4">Vault Practice Hub</h2>
                     <p class="text-slate-600 dark:text-slate-400">Test your knowledge of the specific details required for the exam.</p>
@@ -839,7 +857,7 @@
             </div>
 
             <!-- VIEW 9: WELLBEING (NEW) -->
-            <div id="view-wellbeing" class="hidden space-y-8 animate-in fade-in duration-500">
+            <div id="view-wellbeing" role="tabpanel" aria-labelledby="tab-wellbeing" tabindex="0" class="hidden space-y-8 animate-in fade-in duration-500">
                 <div class="text-center max-w-3xl mx-auto mb-4 px-4">
                     <h2 class="text-4xl font-black text-rose-600 dark:text-rose-400 mb-4">Take a Breath.</h2>
                     <p class="text-slate-600 dark:text-slate-400">Exam stress is completely normal. Use these tools to reset your nervous system.</p>
@@ -885,694 +903,8 @@
         </footer>
     </div>
 
-    <!-- AUDIO SYSTEM -->
-    <script>
-        function playBeep(type) {
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            if(!AudioContext) return;
-            const ctx = new AudioContext();
-            const osc = ctx.createOscillator();
-            const gain = ctx.createGain();
-            osc.connect(gain);
-            gain.connect(ctx.destination);
-            
-            if(type === 'ding') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(1200, ctx.currentTime + 0.1);
-                gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
-                osc.start(ctx.currentTime);
-                osc.stop(ctx.currentTime + 0.3);
-            } else if (type === 'alarm') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(400, ctx.currentTime);
-                osc.frequency.setValueAtTime(600, ctx.currentTime + 0.2);
-                osc.frequency.setValueAtTime(400, ctx.currentTime + 0.4);
-                osc.frequency.setValueAtTime(600, ctx.currentTime + 0.6);
-                gain.gain.setValueAtTime(0.2, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.5);
-                osc.start(ctx.currentTime);
-                osc.stop(ctx.currentTime + 1.5);
-            }
-        }
-    </script>
-
-    <!-- CORE LOGIC -->
-    <script>
-        // --- Gamification Logic ---
-        let xp = parseInt(localStorage.getItem('whs_xp')) || 0;
-
-        function updateXPDisplay() {
-            let level = Math.floor(Math.sqrt(xp / 10)) + 1;
-            document.getElementById('xp-display').innerText = xp;
-            document.getElementById('level-display').innerText = level;
-        }
-
-        function addXP(amount) {
-            let oldLevel = Math.floor(Math.sqrt(xp / 10)) + 1;
-            xp += amount;
-            localStorage.setItem('whs_xp', xp);
-            let newLevel = Math.floor(Math.sqrt(xp / 10)) + 1;
-            
-            updateXPDisplay();
-            playBeep('ding');
-
-            if (newLevel > oldLevel) {
-                const container = document.getElementById('xp-container');
-                container.classList.add('level-up');
-                setTimeout(() => container.classList.remove('level-up'), 1000);
-            }
-        }
-
-        function initStreak() {
-            const today = new Date().toDateString();
-            let lastLogin = localStorage.getItem('whs_last_login');
-            let streak = parseInt(localStorage.getItem('whs_streak')) || 0;
-
-            if (lastLogin !== today) {
-                const yesterday = new Date(Date.now() - 86400000).toDateString();
-                if (lastLogin === yesterday) {
-                    streak++;
-                } else if (lastLogin !== null) {
-                    streak = 1; 
-                }
-                localStorage.setItem('whs_last_login', today);
-                localStorage.setItem('whs_streak', streak);
-            }
-            const counter = document.getElementById('streak-counter');
-            if(counter) counter.innerText = streak || 1;
-        }
-
-        function initCountdown() {
-            // Hardcoded Date: Wednesday 18th November 2026 9.30am
-            const targetDate = new Date("November 18, 2026 09:30:00");
-            const now = new Date();
-            const diffTime = targetDate - now;
-            
-            document.getElementById('exam-date-label').innerText = "Wed 18 Nov, 9:30am";
-            
-            if (diffTime > 0) {
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
-                document.getElementById('exam-countdown').innerText = `${diffDays} Days to go`;
-            } else {
-                document.getElementById('exam-countdown').innerText = `Exam Today!`;
-            }
-        }
-
-        // --- To-Do List Logic ---
-        function initTodos() { 
-            const todos = JSON.parse(localStorage.getItem('whs_history_todos'));
-            if (!todos || todos.length === 0) {
-                const defaultTodos = [
-                    { text: "Memorise 3 stats for US Perspective", done: false },
-                    { text: "Memorise 2 quotes from Hirohito", done: false },
-                    { text: "Score 100% on the Practice Quiz", done: false },
-                    { text: "Draft one Excellence-level paragraph", done: false }
-                ];
-                localStorage.setItem('whs_history_todos', JSON.stringify(defaultTodos));
-            }
-            renderTodos(); 
-        }
-
-        function renderTodos() {
-            const todos = JSON.parse(localStorage.getItem('whs_history_todos')) || [];
-            const list = document.getElementById('todo-list');
-            list.innerHTML = '';
-            todos.forEach((t, i) => {
-                list.innerHTML += `
-                <li class="flex justify-between items-center bg-slate-50 dark:bg-slate-700/50 p-2 md:p-3 rounded-lg border border-slate-200 dark:border-slate-600 transition ${t.done ? 'opacity-50' : ''}">
-                    <span class="text-sm ${t.done ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-800 dark:text-slate-200 font-medium'}">${t.text}</span>
-                    <div class="flex gap-2 shrink-0">
-                        <button onclick="toggleTodo(${i})" class="text-xs font-bold px-2 py-1 rounded bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-600 ${t.done ? 'text-slate-600 dark:text-slate-400' : 'text-emerald-600 dark:text-emerald-400'}">${t.done ? 'Undo' : 'Done ✓'}</button>
-                        <button onclick="deleteTodo(${i})" class="text-xs font-bold px-2 py-1 rounded bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400">✕</button>
-                    </div>
-                </li>`;
-            });
-        }
-
-        function addTodo() {
-            const input = document.getElementById('todo-input');
-            const text = input.value.trim();
-            if (text) {
-                const todos = JSON.parse(localStorage.getItem('whs_history_todos')) || [];
-                todos.push({ text: text, done: false });
-                localStorage.setItem('whs_history_todos', JSON.stringify(todos));
-                input.value = '';
-                renderTodos();
-            }
-        }
-
-        function toggleTodo(index) {
-            const todos = JSON.parse(localStorage.getItem('whs_history_todos'));
-            todos[index].done = !todos[index].done;
-            localStorage.setItem('whs_history_todos', JSON.stringify(todos));
-            if(todos[index].done) addXP(10);
-            renderTodos();
-        }
-
-        function deleteTodo(index) {
-            const todos = JSON.parse(localStorage.getItem('whs_history_todos'));
-            todos.splice(index, 1);
-            localStorage.setItem('whs_history_todos', JSON.stringify(todos));
-            renderTodos();
-        }
-
-        // --- Exam Timer Logic (Sandbox) ---
-        let timerInterval = null;
-        let timeLeft = 3000; // 50 mins
-
-        function updateTimerDisplay() {
-            const m = Math.floor(timeLeft/60).toString().padStart(2, '0');
-            const s = (timeLeft%60).toString().padStart(2, '0');
-            document.getElementById('timer-display').innerText = `${m}:${s}`;
-        }
-
-        function toggleTimer() {
-            const btn = document.getElementById('exam-timer-btn');
-            if(timerInterval) {
-                clearInterval(timerInterval);
-                timerInterval = null;
-                btn.innerHTML = `⏱️ Paused: <span id="timer-display" class="tabular-nums font-mono text-lg">${document.getElementById('timer-display').innerText}</span>`;
-                btn.classList.remove('bg-rose-600', 'border-rose-500');
-                btn.classList.add('bg-amber-500', 'border-amber-400');
-            } else {
-                // If it's starting from zero, reset to 50
-                if (timeLeft <= 0) timeLeft = 3000;
-                
-                btn.classList.remove('bg-slate-800', 'bg-amber-500', 'border-slate-700', 'border-amber-400');
-                btn.classList.add('bg-rose-600', 'border-rose-500', 'animate-pulse');
-                
-                // Play starting beep
-                const AudioContext = window.AudioContext || window.webkitAudioContext;
-                if(AudioContext) {
-                    const ctx = new AudioContext();
-                    ctx.resume().then(() => playBeep('ding'));
-                }
-                
-                timerInterval = setInterval(() => {
-                    timeLeft--;
-                    updateTimerDisplay();
-                    if(timeLeft <= 0) {
-                        clearInterval(timerInterval);
-                        timerInterval = null;
-                        playBeep('alarm');
-                        btn.classList.remove('animate-pulse', 'bg-rose-600', 'border-rose-500');
-                        btn.classList.add('bg-slate-800', 'border-slate-700');
-                        btn.innerHTML = `⏱️ Time's Up!`;
-                        alert("Exam time is up! Pens down.");
-                    } else {
-                        btn.innerHTML = `⏱️ Running: <span id="timer-display" class="tabular-nums font-mono text-lg">${Math.floor(timeLeft/60).toString().padStart(2,'0')}:${(timeLeft%60).toString().padStart(2,'0')}</span>`;
-                    }
-                }, 1000);
-            }
-        }
-
-        // --- Chart.js Logic (Quiz Scores) ---
-        let quizChartInstance = null;
-
-        function initQuizChart() {
-            const canvas = document.getElementById('quizChart');
-            if (!canvas) return;
-            const ctx = canvas.getContext('2d');
-            if (quizChartInstance) quizChartInstance.destroy();
-
-            // Load last 7 scores or default
-            let scores = JSON.parse(localStorage.getItem('whs_quiz_scores')) || [0,0,0,0,0,0,0];
-            const labels = ['1','2','3','4','5','6','Latest'];
-            const isDark = document.documentElement.classList.contains('dark');
-            const textColor = isDark ? '#94a3b8' : '#475569';
-            const gridColor = isDark ? '#334155' : '#e2e8f0';
-
-            quizChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Score (out of 5)',
-                        data: scores,
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                        borderWidth: 3,
-                        pointBackgroundColor: '#10b981',
-                        pointRadius: 4,
-                        fill: true,
-                        tension: 0.3
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { min: 0, max: 5, ticks: { stepSize: 1, color: textColor }, grid: { color: gridColor } },
-                        x: { ticks: { color: textColor }, grid: { display: false } }
-                    }
-                }
-            });
-        }
-
-        function updateQuizChart(newScore) {
-            let scores = JSON.parse(localStorage.getItem('whs_quiz_scores')) || [0,0,0,0,0,0,0];
-            scores.shift(); // remove oldest
-            scores.push(newScore); // add newest
-            localStorage.setItem('whs_quiz_scores', JSON.stringify(scores));
-            
-            if(quizChartInstance) {
-                quizChartInstance.data.datasets[0].data = scores;
-                quizChartInstance.update();
-            } else {
-                initQuizChart();
-            }
-        }
-
-
-        // --- Dark Mode Logic ---
-        function toggleDarkMode() {
-            document.documentElement.classList.toggle('dark');
-            const isDark = document.documentElement.classList.contains('dark');
-            localStorage.setItem('whs_theme', isDark ? 'dark' : 'light');
-            setTimeout(initQuizChart, 50); // Redraw chart colors
-        }
-        if (localStorage.getItem('whs_theme') === 'dark' || (!('whs_theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            document.documentElement.classList.add('dark');
-        }
-
-        // --- Navigation Logic ---
-        document.body.addEventListener('click', function(e) {
-            var target = e.target.closest('[data-action="view"]');
-            if (!target) return;
-            
-            var viewId = target.getAttribute('data-target');
-            
-            ['standard', 'sources', 'perspectives', 'vault', 'blueprint', 'practice', 'feedback', 'exemplars', 'wellbeing'].forEach(function(v) {
-                var el = document.getElementById('view-' + v);
-                var btn = document.querySelector('[data-target="' + v + '"]');
-                if (el) { el.classList.remove('block'); el.classList.add('hidden'); }
-                if (btn) btn.classList.remove('nav-active');
-            });
-            
-            var activeView = document.getElementById('view-' + viewId);
-            var activeBtn = document.querySelector('[data-target="' + viewId + '"]');
-            if (activeView) { activeView.classList.remove('hidden'); activeView.classList.add('block'); }
-            if (activeBtn) activeBtn.classList.add('nav-active');
-
-            if(viewId === 'practice') {
-                setTimeout(initQuizChart, 100);
-            }
-        });
-
-        // --- Interactive Timeline Logic ---
-        const timelineData = {
-            'jul26': { title: 'July 26, 1945: The Potsdam Declaration', text: 'The US, UK, and China issue the Potsdam Declaration, demanding the unconditional surrender of all Japanese armed forces. It explicitly threatens "prompt and utter destruction" if Japan refuses.' },
-            'aug6': { title: 'August 6, 1945: Hiroshima', text: 'The US drops the first atomic bomb ("Little Boy") on the city of Hiroshima. An estimated 70,000 to 135,000 people are killed.' },
-            'aug8': { title: 'August 8, 1945: Soviet Invasion', text: 'The Soviet Union officially declares war on Japan and invades Japanese-occupied Manchuria. This shatters Japanese hopes of Soviet mediation for a negotiated peace.' },
-            'aug9': { title: 'August 9, 1945: Nagasaki', text: 'The US drops the second atomic bomb ("Fat Man") on the city of Nagasaki, killing an estimated 39,000 to 80,000 people.' },
-            'aug9_10': { title: 'August 9-10, 1945: The Emperor Intervenes', text: 'During a midnight meeting of the Supreme Council for the Direction of the War, Emperor Hirohito takes the unprecedented step of intervening in the 3-3 deadlocked debate, deciding to accept the Potsdam Declaration provided the imperial institution is preserved.' },
-            'aug11': { title: 'August 11, 1945: The Byrnes Note', text: 'US Secretary of State James F. Byrnes drafts a response to Japan stating that the authority of the Emperor would be "subject to the Supreme Commander of the Allied powers." It provides just enough ambiguity for Japan to surrender.' },
-            'aug15': { title: 'August 15, 1945: Jewel Voice Broadcast', text: 'Emperor Hirohito\'s prerecorded radio address (the Gyokuon-hōsō) is broadcast to the Japanese people, publicly announcing the surrender and citing the "cruel bomb".' },
-            'sep2': { title: 'September 2, 1945: Formal Surrender', text: 'Formal surrender documents are signed by Japanese delegates and Allied forces aboard the USS Missouri in Tokyo Bay, officially ending WWII.' }
-        };
-
-        function showTimeline(id, btnElement) {
-            const display = document.getElementById('timeline-display');
-            const data = timelineData[id];
-            
-            document.querySelectorAll('.timeline-btn').forEach(btn => btn.classList.remove('active', 'shadow-md'));
-            btnElement.classList.add('active', 'shadow-md');
-
-            display.style.opacity = 0;
-            setTimeout(() => {
-                display.innerHTML = `<div><h4 class="text-xl font-black text-whs-dark dark:text-blue-400 mb-2">${data.title}</h4><p class="text-slate-700 dark:text-slate-300 font-medium leading-relaxed">${data.text}</p></div>`;
-                display.style.opacity = 1;
-            }, 200);
-        }
-
-
-        // --- Practice Hub (Quiz & Flashcards) Logic ---
-        const masterQuizData = [
-            { q: "What was the doctrine established by the Allies in January 1943?", opts: ["The Four Freedoms", "Unconditional Surrender", "The Potsdam Declaration", "Operation Ketsugo"], ans: 1, exp: "Correct! 'Unconditional Surrender' was established by FDR in 1943." },
-            { q: "What event on August 8, 1945, shattered Japan's hope for a negotiated peace?", opts: ["Bombing of Hiroshima", "Bombing of Nagasaki", "Soviet Union declared war", "Military coup"], ans: 2, exp: "Correct! The Soviet invasion eliminated Japan's last diplomatic option." },
-            { q: "Which concept drove Emperor Hirohito to preserve the imperial system?", opts: ["Democracy", "Unconditional Surrender", "Article 9", "Kokutai"], ans: 3, exp: "Correct! 'Kokutai' refers to the National Essence or the preservation of the imperial system." },
-            { q: "What nickname was given to General MacArthur by the Japanese public?", opts: ["The Iron Commander", "The Gentle Conqueror", "The Emperor's Voice", "The Great Rebuilder"], ans: 1, exp: "Correct! Because of his focus on rebuilding, he was called the 'Gentle Conqueror'." },
-            { q: "What was the upper estimate of American casualties President Truman was trying to avoid with Operation Downfall?", opts: ["50,000+", "100,000+", "132,000+", "1 Million+"], ans: 3, exp: "Correct! Military planners estimated up to 1 Million+ casualties if a land invasion occurred." },
-            { q: "When did Emperor Hirohito deliver the Jewel Voice Broadcast?", opts: ["July 26, 1945", "August 6, 1945", "August 8, 1945", "August 15, 1945"], ans: 3, exp: "Correct! He announced the surrender on August 15, 1945." },
-            { q: "What caused a stalemate in the Japanese leadership council?", opts: ["A 3-3 split in the 'Big Six'", "Loss of communication", "Assassination of leaders", "American blockades"], ans: 0, exp: "Correct! A 3-3 split in the 'Big Six' paralyzed the government, forcing the Emperor to intervene." },
-            { q: "Who drafted the 'Byrnes Note' on August 11?", opts: ["Henry Stimson", "Harry Truman", "James F. Byrnes", "Douglas MacArthur"], ans: 2, exp: "Correct! US Secretary of State James F. Byrnes drafted the note keeping the Emperor's authority subject to the Supreme Commander." },
-            { q: "Which US Secretary of War advocated for allowing Japan to keep the Emperor?", opts: ["Franklin D. Roosevelt", "Harry S. Truman", "Henry L. Stimson", "James F. Byrnes"], ans: 2, exp: "Correct! Henry L. Stimson believed it was the only way to secure a prompt and orderly surrender." },
-            { q: "What wider historical context was Truman preparing for by rebuilding Japan?", opts: ["World War I", "The Vietnam War", "The Cold War", "The Korean War"], ans: 2, exp: "Correct! The US wanted Japan to be a strong capitalist shield in the upcoming Cold War against the Soviet Union." },
-            { q: "What did the Potsdam Declaration (July 26) threaten if Japan refused to surrender?", opts: ["Economic sanctions", "Prompt and utter destruction", "Loss of the Emperor", "A naval blockade"], ans: 1, exp: "Correct! It explicitly threatened 'prompt and utter destruction'." },
-            { q: "Who was the Prime Minister of Japan during the surrender who asked the Emperor to break the deadlock?", opts: ["Shigeru Yoshida", "Korechika Anami", "Kantaro Suzuki", "Hideki Tojo"], ans: 2, exp: "Correct! Kantaro Suzuki was the PM who asked the Emperor to intervene." }
-        ];
-
-        let activeQuizPool = [];
-        let currentQIndex = 0;
-        let quizScore = 0;
-
-        function setPracticeMode(mode) {
-            const qBtn = document.getElementById('toggle-quiz');
-            const fBtn = document.getElementById('toggle-flash');
-            const qCon = document.getElementById('quiz-mode-container');
-            const fCon = document.getElementById('flash-mode-container');
-
-            if(mode === 'quiz') {
-                qBtn.className = "px-6 py-2 rounded-md font-bold text-sm bg-white dark:bg-slate-900 text-whs-dark dark:text-blue-400 shadow-sm transition";
-                fBtn.className = "px-6 py-2 rounded-md font-bold text-sm text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition";
-                qCon.classList.remove('hidden'); qCon.classList.add('block');
-                fCon.classList.add('hidden'); fCon.classList.remove('block');
-            } else {
-                fBtn.className = "px-6 py-2 rounded-md font-bold text-sm bg-white dark:bg-slate-900 text-whs-dark dark:text-blue-400 shadow-sm transition";
-                qBtn.className = "px-6 py-2 rounded-md font-bold text-sm text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition";
-                fCon.classList.remove('hidden'); fCon.classList.add('block');
-                qCon.classList.add('hidden'); qCon.classList.remove('block');
-                initFlashcards();
-            }
-        }
-
-        function shuffle(array) {
-            let currentIndex = array.length,  randomIndex;
-            while (currentIndex != 0) {
-                randomIndex = Math.floor(Math.random() * currentIndex);
-                currentIndex--;
-                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-            }
-            return array;
-        }
-
-        function initQuiz() {
-            const shuffledPool = shuffle([...masterQuizData]);
-            activeQuizPool = shuffledPool.slice(0, 5); 
-            
-            currentQIndex = 0;
-            quizScore = 0;
-            document.getElementById('quiz-results').classList.add('hidden');
-            document.getElementById('quiz-container').classList.remove('hidden');
-            loadQuestion();
-        }
-
-        function loadQuestion() {
-            const q = activeQuizPool[currentQIndex];
-            document.getElementById('quiz-progress').innerText = `Question ${currentQIndex + 1} of 5`;
-            document.getElementById('quiz-score').innerText = `Score: ${quizScore}`;
-            document.getElementById('quiz-question').innerText = q.q;
-            document.getElementById('quiz-feedback-container').classList.add('hidden');
-            
-            const optsContainer = document.getElementById('quiz-options');
-            optsContainer.innerHTML = '';
-            
-            q.opts.forEach((opt, index) => {
-                const btn = document.createElement('div');
-                btn.className = 'quiz-option bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700';
-                btn.innerText = opt;
-                btn.onclick = () => selectAnswer(index, btn);
-                optsContainer.appendChild(btn);
-            });
-        }
-
-        function selectAnswer(selectedIndex, btnElement) {
-            const q = activeQuizPool[currentQIndex];
-            const allOptions = document.querySelectorAll('.quiz-option');
-            allOptions.forEach(opt => opt.classList.add('disabled'));
-
-            if (selectedIndex === q.ans) {
-                btnElement.classList.add('correct');
-                quizScore++;
-                document.getElementById('quiz-score').innerText = `Score: ${quizScore}`;
-            } else {
-                btnElement.classList.add('incorrect');
-                allOptions[q.ans].classList.add('correct'); 
-            }
-
-            const feedbackContainer = document.getElementById('quiz-feedback-container');
-            const expText = document.getElementById('quiz-explanation');
-            expText.innerText = q.exp;
-            expText.className = selectedIndex === q.ans ? 'p-4 rounded-lg font-medium text-sm mb-4 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800' : 'p-4 rounded-lg font-medium text-sm mb-4 bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-300 border border-red-200 dark:border-red-800';
-            
-            feedbackContainer.classList.remove('hidden');
-        }
-
-        document.getElementById('quiz-next-btn').onclick = () => {
-            currentQIndex++;
-            if (currentQIndex < activeQuizPool.length) {
-                loadQuestion();
-            } else {
-                showQuizResults();
-            }
-        };
-
-        function showQuizResults() {
-            document.getElementById('quiz-container').classList.add('hidden');
-            const resultsScreen = document.getElementById('quiz-results');
-            resultsScreen.classList.remove('hidden');
-            
-            document.getElementById('final-score').innerText = `${quizScore}/5`;
-            
-            let message = "";
-            if (quizScore === 5) {
-                message = "Perfect! You know the Evidence Vault inside and out. You are ready for Excellence.";
-                addXP(50); // Reward max score
-            }
-            else if (quizScore >= 3) message = "Good job! You have a solid grasp of the facts, but review the Vault one more time to lock in the details.";
-            else message = "Keep practicing! Specific evidence is required to pass. Study the Evidence Vault tab and try again.";
-            
-            document.getElementById('results-message').innerText = message;
-            
-            updateQuizChart(quizScore);
-        }
-
-        // --- Flashcard Logic ---
-        const flashcardData = [
-            { front: "July 26, 1945", back: "Potsdam Declaration issued, demanding unconditional surrender." },
-            { front: "August 8-9, 1945", back: "Soviet Union declares war on Japan and invades Manchuria." },
-            { front: "August 9-10, 1945", back: "Emperor Hirohito intervenes in deadlocked midnight meeting." },
-            { front: "August 15, 1945", back: "Emperor Hirohito delivers the Jewel Voice Broadcast." },
-            { front: "Emperor Hirohito", back: "Stepped in to break a 3-3 deadlock, prioritizing the survival of the Japanese nation." },
-            { front: "Henry L. Stimson", back: "US Secretary of War. Advocated allowing Japan to keep the Emperor." },
-            { front: "James F. Byrnes", back: "US Secretary of State. Drafted the 'Byrnes Note'." },
-            { front: "The 'Big Six'", back: "Japan's Supreme War Council, paralyzed by a 3-3 split." },
-            { front: "Gen. Korechika Anami", back: "Japanese Minister of War. Hardliner pushing for Ketsu-Gō (mainland battle)." },
-            { front: "Kantaro Suzuki", back: "Japanese PM who asked Emperor to break the 3-3 deadlock." },
-            { front: "1 Million+", back: "Upper estimate of US casualties for land invasion (Operation Downfall)." },
-            { front: "Kokutai", back: "National Essence and Imperial preservation." },
-            { front: "Wider Context (US)", back: "Preparing for the Cold War by building a democratic, capitalist ally." }
-        ];
-
-        let currentCardIndex = 0;
-        
-        function initFlashcards() {
-            currentCardIndex = 0;
-            updateFlashcardUI();
-        }
-
-        function toggleFlip() {
-            document.getElementById('flashcard-element').classList.toggle('flipped');
-        }
-
-        function updateFlashcardUI() {
-            const card = document.getElementById('flashcard-element');
-            card.classList.remove('flipped'); 
-            
-            setTimeout(() => { 
-                document.getElementById('flash-front-text').innerText = flashcardData[currentCardIndex].front;
-                document.getElementById('flash-back-text').innerText = flashcardData[currentCardIndex].back;
-                document.getElementById('flash-progress').innerText = `Card ${currentCardIndex + 1} of ${flashcardData.length}`;
-            }, 150);
-        }
-
-        function nextCard() {
-            currentCardIndex = (currentCardIndex + 1) % flashcardData.length;
-            updateFlashcardUI();
-            if (currentCardIndex === 0) addXP(10); // Reward for cycling through all
-        }
-
-        function prevCard() {
-            currentCardIndex = (currentCardIndex - 1 + flashcardData.length) % flashcardData.length;
-            updateFlashcardUI();
-        }
-
-        initQuiz();
-
-
-        // --- Writing Sandbox Logic ---
-        const sandboxPrompts = [
-            "1 - Identify an individual or group from your chosen historical context. What was their perspective?",
-            "2 - How did at least ONE action taken by the individual or group in (a) demonstrate their perspective?",
-            "3 - Identify a different individual or group from your chosen historical context. What was their perspective and how does it differ from the first perspective you identified?",
-            "4 - How did at least ONE action taken by the 2nd individual or group demonstrate their perspective and how does it differ from the action(s) identified in your 1st individual or group."
-        ];
-
-        function setSandboxQuestion(index, btnElement) {
-            const allBtns = document.querySelectorAll('.question-btn');
-            allBtns.forEach(btn => {
-                btn.className = "question-btn p-3 text-left rounded-lg text-xs font-semibold bg-slate-50 dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800";
-            });
-            btnElement.className = "question-btn active p-3 text-left rounded-lg text-xs font-semibold bg-[#fefce8] border-whs-gold text-[#854d0e] dark:bg-yellow-900/30 dark:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/50";
-            document.getElementById('active-question-display').innerText = sandboxPrompts[index];
-        }
-
-        const vaultKeywords = {
-            names: ['truman', 'macarthur', 'hirohito', 'big six', 'anami', 'yoshida', 'stimson', 'byrnes', 'suzuki'],
-            dates: ['1943', '1945', 'july 26', 'august 6', 'august 8', 'august 9', 'august 15', 'september 2', '1951', '132,000', '1 million', '3-3', '6 days', '70,000', '39,000'],
-            concepts: ['kokutai', 'unconditional surrender', 'potsdam', 'byrnes note', 'annihilation', 'gentle conqueror', 'boundless gratitude', 'cold war', 'meiji', 'soviet', 'downfall', 'ketsu', 'rain of ruin']
-        };
-
-        // Regex Error Checks for expanded NLP fact-checking
-        const errorChecks = [
-            { regex: /atomic bomb(s)? on tokyo/i, warning: "Error: The atomic bombs were dropped on Hiroshima and Nagasaki, not Tokyo (which was firebombed earlier)." },
-            { regex: /hirohito dropped/i, warning: "Error: Emperor Hirohito did not drop the bomb; US President Truman authorized it." },
-            { regex: /macarthur dropped/i, warning: "Error: General MacArthur was the Supreme Commander of the occupation, but Truman authorized the atomic bombs." },
-            { regex: /hirohito wanted to continue|hirohito wanted to fight/i, warning: "Error: Hirohito broke the deadlock to SURRENDER. It was military hardliners like Anami who wanted to continue the war." },
-            { regex: /soviet(s)? dropped|russia(ns)? dropped/i, warning: "Error: The Soviet Union declared war and invaded Manchuria, but the US dropped the atomic bombs." },
-            { regex: /fdr dropped|roosevelt dropped/i, warning: "Error: FDR died in April 1945. Truman authorized the bombs." },
-            { regex: /august 6(.{1,15})nagasaki/i, warning: "Error: Hiroshima was bombed on August 6; Nagasaki was bombed on August 9." },
-            { regex: /august 9(.{1,15})hiroshima/i, warning: "Error: Hiroshima was bombed on August 6; Nagasaki was bombed on August 9." }
-        ];
-
-        const textArea = document.getElementById('sandbox-text');
-        
-        window.addEventListener('DOMContentLoaded', () => {
-            initStreak();
-            updateXPDisplay();
-            initTodos();
-            initCountdown();
-            initQuizChart();
-
-            const savedDraft = localStorage.getItem('whs_draft_essay');
-            if (savedDraft) {
-                textArea.value = savedDraft;
-                const words = savedDraft.trim().split(/\s+/).filter(w => w.length > 0).length;
-                document.getElementById('word-count').innerText = `${words} words`;
-                if(words > 20) analyzeText();
-            }
-        });
-
-        let typingTimer;
-        textArea.addEventListener('input', () => {
-            const words = textArea.value.trim().split(/\s+/).filter(w => w.length > 0).length;
-            document.getElementById('word-count').innerText = `${words} words`;
-            
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(() => {
-                localStorage.setItem('whs_draft_essay', textArea.value);
-                const ind = document.getElementById('save-indicator');
-                ind.style.opacity = 1;
-                setTimeout(() => { ind.style.opacity = 0; }, 2000);
-            }, 1500);
-        });
-
-        let hasAwardedWritingXP = false;
-
-        function analyzeText() {
-            const rawText = textArea.value;
-            const text = rawText.toLowerCase();
-            const wordCount = text.trim().split(/\s+/).filter(w => w.length > 0).length;
-            
-            document.getElementById('analysis-placeholder').classList.add('hidden');
-            document.getElementById('analysis-results').classList.remove('hidden');
-
-            if (wordCount < 20) {
-                document.getElementById('feedback-message').innerText = "Keep writing! A good paragraph needs more explanation. Aim for at least 50-80 words.";
-                document.getElementById('strength-bar').style.width = "10%";
-                document.getElementById('strength-text').innerText = "10%";
-                resetBadges();
-                document.getElementById('fact-check-module').classList.add('hidden');
-                return;
-            }
-
-            const foundNames = vaultKeywords.names.filter(kw => text.includes(kw));
-            const foundDates = vaultKeywords.dates.filter(kw => text.includes(kw));
-            const foundConcepts = vaultKeywords.concepts.filter(kw => text.includes(kw));
-
-            renderBadges('found-names', foundNames, 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300');
-            renderBadges('found-dates', foundDates, 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300');
-            renderBadges('found-concepts', foundConcepts, 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300');
-
-            // Regex Fact Checking
-            const foundErrors = errorChecks.filter(err => err.regex.test(text));
-            const errorModule = document.getElementById('fact-check-module');
-            const errorList = document.getElementById('found-errors');
-            
-            if (foundErrors.length > 0) {
-                errorModule.classList.remove('hidden');
-                errorList.innerHTML = foundErrors.map(err => `<li>${err.warning}</li>`).join('');
-            } else {
-                errorModule.classList.add('hidden');
-            }
-
-            let analysisScore = 30; 
-            analysisScore += Math.min(foundNames.length * 10, 20); 
-            analysisScore += Math.min(foundDates.length * 10, 20); 
-            analysisScore += Math.min(foundConcepts.length * 15, 30); 
-            
-            if (text.includes('cold war') || text.includes('meiji') || text.includes('soviet')) analysisScore += 10;
-
-            if (foundErrors.length > 0) analysisScore = Math.max(analysisScore - 20, 10);
-
-            analysisScore = Math.min(analysisScore, 100);
-
-            document.getElementById('strength-bar').style.width = `${analysisScore}%`;
-            document.getElementById('strength-bar').className = `h-3 rounded-full transition-all duration-1000 ${analysisScore > 79 ? 'bg-[#10b981]' : analysisScore > 49 ? 'bg-[#c5a059]' : 'bg-red-500'}`;
-            document.getElementById('strength-text').innerText = `${analysisScore}%`;
-
-            let msg = "";
-            if (foundErrors.length > 0) msg = "You have some good evidence, but double-check your facts! The AI detected a potential historical error in your writing (see above).";
-            else if (analysisScore >= 90) {
-                msg = "Excellent! You have woven together specific names, dates, and complex historical concepts perfectly. If you linked this to the wider context, this is an 'E' level paragraph.";
-                if(!hasAwardedWritingXP) { addXP(100); hasAwardedWritingXP = true; }
-            }
-            else if (analysisScore >= 60) msg = "Solid Merit level! You are using good evidence. Try adding one more exact statistic (like 1 Million) or connecting it to the Wider Context (Cold War/Meiji era) for Excellence.";
-            else msg = "Good start, but you need more specific evidence. Examiners want to see exact names, dates, and quotes. Check the Evidence Vault and try dropping two facts into your writing.";
-
-            document.getElementById('feedback-message').innerText = msg;
-        }
-
-        function renderBadges(elementId, items, colorClasses) {
-            const container = document.getElementById(elementId);
-            if (items.length === 0) {
-                container.innerHTML = '<span class="text-xs text-slate-400 italic">None found</span>';
-                return;
-            }
-            container.innerHTML = items.map(item => `<span class="text-[10px] font-bold px-2 py-0.5 rounded uppercase ${colorClasses}">${item}</span>`).join('');
-        }
-
-        function resetBadges() {
-            document.getElementById('found-names').innerHTML = '<span class="text-xs text-slate-400 italic">None yet.</span>';
-            document.getElementById('found-dates').innerHTML = '<span class="text-xs text-slate-400 italic">None yet.</span>';
-            document.getElementById('found-concepts').innerHTML = '<span class="text-xs text-slate-400 italic">None yet.</span>';
-        }
-
-        function copyDraft() {
-            const text = textArea.value;
-            if(!text) return;
-            const btn = document.getElementById('copy-btn');
-            
-            const tmp = document.createElement("textarea");
-            tmp.value = text;
-            document.body.appendChild(tmp);
-            tmp.select();
-            document.execCommand('copy');
-            document.body.removeChild(tmp);
-            
-            btn.innerText = "Copied ✓";
-            btn.classList.add('bg-emerald-100', 'text-emerald-800', 'dark:bg-emerald-900', 'dark:text-emerald-300');
-            setTimeout(() => {
-                btn.innerText = "Copy";
-                btn.classList.remove('bg-emerald-100', 'text-emerald-800', 'dark:bg-emerald-900', 'dark:text-emerald-300');
-            }, 2000);
-        }
-
-        function togglePeel() {
-            const guide = document.getElementById('peel-guide');
-            const isHidden = guide.classList.contains('hidden');
-            if(isHidden) {
-                guide.classList.remove('hidden');
-                guide.classList.add('grid');
-            } else {
-                guide.classList.add('hidden');
-                guide.classList.remove('grid');
-            }
-        }
-
-    </script>
+    <!-- App logic lives in content-data.js (edit content here) and app.js (edit behaviour here) -->
+    <script src="content-data.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
