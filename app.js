@@ -360,7 +360,10 @@
 
             display.style.opacity = 0;
             setTimeout(() => {
-                display.innerHTML = `<div><h4 class="text-xl font-black text-whs-dark dark:text-blue-400 mb-2">${data.title}</h4><p class="text-slate-700 dark:text-slate-300 font-medium leading-relaxed">${data.text}</p></div>`;
+                const imageHtml = data.img
+                    ? `<div class="shrink-0 w-full sm:w-40"><img src="${data.img}" alt="${data.imgAlt || ''}" class="w-full h-32 sm:h-full object-cover rounded-lg shadow-sm border border-slate-200 dark:border-slate-700"><p class="text-[10px] text-slate-500 dark:text-slate-400 mt-1 leading-tight">${data.imgCaption || ''}</p></div>`
+                    : '';
+                display.innerHTML = `<div class="flex flex-col sm:flex-row gap-4 items-start w-full">${imageHtml}<div><h4 class="text-xl font-black text-whs-dark dark:text-blue-400 mb-2">${data.title}</h4><p class="text-slate-700 dark:text-slate-300 font-medium leading-relaxed">${data.text}</p></div></div>`;
                 display.style.opacity = 1;
             }, 200);
         }
@@ -725,4 +728,3 @@
                 guide.classList.remove('grid');
             }
         }
-
