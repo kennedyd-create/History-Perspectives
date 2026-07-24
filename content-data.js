@@ -18,7 +18,7 @@ const timelineData = {
             'aug9_10': { title: 'August 9-10, 1945: The Emperor Intervenes', text: 'During a midnight meeting of the Supreme Council for the Direction of the War, Emperor Hirohito takes the unprecedented step of intervening in the 3-3 deadlocked debate, deciding to accept the Potsdam Declaration provided the imperial institution is preserved.' },
             'aug11': { title: 'August 11, 1945: The Byrnes Note', text: 'US Secretary of State James F. Byrnes drafts a response to Japan stating that the authority of the Emperor would be "subject to the Supreme Commander of the Allied powers." It provides just enough ambiguity for Japan to surrender.' },
             'aug15': { title: 'August 15, 1945: Jewel Voice Broadcast', text: 'Emperor Hirohito\'s prerecorded radio address (the Gyokuon-hōsō) is broadcast to the Japanese people, publicly announcing the surrender and citing the "cruel bomb".' },
-            'sep2': { title: 'September 2, 1945: Formal Surrender', text: 'Formal surrender documents are signed by Japanese delegates and Allied forces aboard the USS Missouri in Tokyo Bay, officially ending WWII.' }
+            'sep2': { title: 'September 2, 1945: Formal Surrender', text: 'Formal surrender documents are signed by Japanese delegates and Allied forces aboard the USS Missouri in Tokyo Bay, officially ending WWII.', img: 'https://cdn2.picryl.com/photo/1945/09/02/surrender-of-japan-uss-missouri-9ff472-1024.jpg', imgAlt: 'Japanese delegates aboard USS Missouri during the surrender ceremony, Tokyo Bay, 2 September 1945', imgCaption: 'Japanese representatives on board USS Missouri during the surrender ceremonies, 2 September 1945. Public domain (US Army Signal Corps, via Wikimedia Commons).' }
         };
 
 const masterQuizData = [
@@ -75,4 +75,3 @@ const errorChecks = [
             { regex: /august 6(.{1,15})nagasaki/i, warning: "Error: Hiroshima was bombed on August 6; Nagasaki was bombed on August 9." },
             { regex: /august 9(.{1,15})hiroshima/i, warning: "Error: Hiroshima was bombed on August 6; Nagasaki was bombed on August 9." }
         ];
-
