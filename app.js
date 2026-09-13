@@ -614,6 +614,7 @@
                 document.getElementById('strength-text').innerText = "10%";
                 resetBadges();
                 document.getElementById('fact-check-module').classList.add('hidden');
+                document.getElementById('requirements-checklist').innerHTML = '';
                 return;
             }
 
@@ -637,29 +638,101 @@
                 errorModule.classList.add('hidden');
             }
 
-            let analysisScore = 30; 
-            analysisScore += Math.min(foundNames.length * 10, 20); 
-            analysisScore += Math.min(foundDates.length * 10, 20); 
-            analysisScore += Math.min(foundConcepts.length * 15, 30); 
-            
-            if (text.includes('cold war') || text.includes('meiji') || text.includes('soviet')) analysisScore += 10;
+            // --- Requirement checks (what the standard actually asks for, not just keyword density) ---
+            const usSide = /\b(truman|byrnes|stimson|us administration|united states|americans?)\b/;
+            const japanSide = /\b(hirohito|emperor|japan(ese)?|kokutai|anami|suzuki|big six)\b/;
+            const valueBeliefWords = /\b(believ|value|kokutai|democracy|four freedoms|militarism|divine|imperial system|national essence)\w*/;
+            const motivationWords = /\b(motivat|wanted to|in order to|so that|aimed to|sought to|driven by|fear of|to avoid|to prevent|to preserve|to end)\w*/;
+            const actionWords = /\b(dropped|authoriz|issued|intervened|broadcast|declaration|signed|delivered|surrender(ed)?|invaded)\w*/;
+            const comparisonWords = /\b(whereas|while|in contrast|however|unlike|compared to|differ(s|ed|ence)?|different from|on the other hand|both sides|both perspectives)\w*/;
+            const explainWhyWords = /\b(because|this shows|this demonstrates|this reveals|this explains|as a result|the reason|due to)\w*/;
+            const widerContextWords = /\b(cold war|meiji|soviet|manchuria|kamikaze|firebomb)\w*/;
+            const explanatoryConnectors = /\b(this shows|this demonstrates|this reveals|this explains|because|as this)\w*/;
+
+            const checks = {
+                perspectiveIdentified: foundNames.length > 0 || usSide.test(text) || japanSide.test(text),
+                valuesExplained: valueBeliefWords.test(text),
+                motivationExplained: motivationWords.test(text),
+                actionLinked: actionWords.test(text) || foundDates.length > 0,
+                evidenceIncluded: (foundNames.length + foundDates.length + foundConcepts.length) >= 2,
+                secondPerspectiveIncluded: usSide.test(text) && japanSide.test(text),
+                explicitComparison: comparisonWords.test(text),
+                explainedWhyDiffered: explainWhyWords.test(text) && comparisonWords.test(text),
+                widerContextUsed: widerContextWords.test(text),
+                evidenceSupportsArgument: explanatoryConnectors.test(text)
+            };
+
+            // Render the checklist so students can see exactly what's missing
+            const checklistLabels = [
+                ['perspectiveIdentified', 'Perspective clearly identified'],
+                ['valuesExplained', 'Values or beliefs explained'],
+                ['motivationExplained', 'Motivation explained'],
+                ['actionLinked', 'Action linked to the perspective'],
+                ['evidenceIncluded', 'Relevant historical evidence included'],
+                ['secondPerspectiveIncluded', 'Second perspective included'],
+                ['explicitComparison', 'Explicit comparison between perspectives'],
+                ['explainedWhyDiffered', 'Explains WHY the perspectives differed'],
+                ['widerContextUsed', 'Wider historical context used'],
+                ['evidenceSupportsArgument', 'Evidence supports an argument, not just listed']
+            ];
+            const checklistEl = document.getElementById('requirements-checklist');
+            checklistEl.innerHTML = checklistLabels.map(([key, label]) => {
+                const ok = checks[key];
+                const icon = ok ? '✓' : '✗';
+                const colorClass = ok ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-400 dark:text-slate-500';
+                return `<li class="flex items-center gap-2"><span class="${colorClass} font-black w-3 shrink-0" aria-hidden="true">${icon}</span><span class="${ok ? '' : 'opacity-60'}">${label}</span></li>`;
+            }).join('');
+
+            // --- Scoring: evidence contributes, but comparison/explanation gate how high the score can go ---
+            let analysisScore = 20;
+            if (checks.perspectiveIdentified) analysisScore += 10;
+            if (checks.valuesExplained) analysisScore += 10;
+            if (checks.motivationExplained) analysisScore += 10;
+            if (checks.actionLinked) analysisScore += 10;
+            analysisScore += Math.min(foundNames.length * 5, 10);
+            analysisScore += Math.min(foundDates.length * 5, 10);
+            analysisScore += Math.min(foundConcepts.length * 5, 10);
+            if (checks.secondPerspectiveIncluded) analysisScore += 10;
+            if (checks.explicitComparison) analysisScore += 10;
+            if (checks.explainedWhyDiffered) analysisScore += 10;
+            if (checks.widerContextUsed) analysisScore += 10;
+
+            // Hard ceilings: lots of evidence cannot substitute for comparison and explanation
+            let ceiling = 100;
+            if (!checks.secondPerspectiveIncluded) ceiling = Math.min(ceiling, 55);
+            else if (!checks.explicitComparison) ceiling = Math.min(ceiling, 65);
+            else if (!checks.explainedWhyDiffered) ceiling = Math.min(ceiling, 84);
 
             if (foundErrors.length > 0) analysisScore = Math.max(analysisScore - 20, 10);
 
-            analysisScore = Math.min(analysisScore, 100);
+            analysisScore = Math.min(analysisScore, ceiling, 100);
 
             document.getElementById('strength-bar').style.width = `${analysisScore}%`;
             document.getElementById('strength-bar').className = `h-3 rounded-full transition-all duration-1000 ${analysisScore > 79 ? 'bg-[#10b981]' : analysisScore > 49 ? 'bg-[#c5a059]' : 'bg-red-500'}`;
             document.getElementById('strength-text').innerText = `${analysisScore}%`;
 
+            // --- Feedback: name the single most important missing thing first ---
             let msg = "";
-            if (foundErrors.length > 0) msg = "You have some good evidence, but double-check your facts! The AI detected a potential historical error in your writing (see above).";
-            else if (analysisScore >= 90) {
-                msg = "Excellent! You have woven together specific names, dates, and complex historical concepts perfectly. If you linked this to the wider context, this is an 'E' level paragraph.";
+            if (foundErrors.length > 0) {
+                msg = "You have some good evidence, but double-check your facts! The AI detected a potential historical error in your writing (see above).";
+            } else if (!checks.perspectiveIdentified) {
+                msg = "Start by clearly naming a perspective (an individual or group) and stating what they believed.";
+            } else if (!checks.secondPerspectiveIncluded) {
+                msg = "You've explored one perspective. To move beyond Achieved, bring in a second perspective (the US Administration or Emperor Hirohito) so there's something to compare it to.";
+            } else if (!checks.explicitComparison) {
+                msg = "You have described two perspectives, but this is currently Achieved-level. To move toward Merit, explicitly compare them — try words like 'whereas', 'in contrast', or 'unlike'.";
+            } else if (!checks.explainedWhyDiffered) {
+                msg = "Good evidence, but you have not yet explained WHY the two perspectives differed. Add a sentence like 'This shows they differed because...' to push toward Excellence.";
+            } else if (!checks.widerContextUsed) {
+                msg = "Strong comparison! To reach Excellence, connect this to the Wider Context (e.g. the Cold War, the Soviet invasion, or the Meiji-era military tradition).";
+                if(!hasAwardedWritingXP) { addXP(70); hasAwardedWritingXP = true; }
+            } else if (analysisScore >= 90) {
+                msg = "Excellent! You've compared both perspectives, explained why they differed, and connected it to the Wider Context. This is Excellence-level work.";
                 if(!hasAwardedWritingXP) { addXP(100); hasAwardedWritingXP = true; }
+            } else {
+                msg = "Solid work! You're comparing perspectives and explaining why they differ. Add one more precise date, quote, or statistic to strengthen the evidence.";
+                if(!hasAwardedWritingXP) { addXP(85); hasAwardedWritingXP = true; }
             }
-            else if (analysisScore >= 60) msg = "Solid Merit level! You are using good evidence. Try adding one more exact statistic (like 1 Million) or connecting it to the Wider Context (Cold War/Meiji era) for Excellence.";
-            else msg = "Good start, but you need more specific evidence. Examiners want to see exact names, dates, and quotes. Check the Evidence Vault and try dropping two facts into your writing.";
 
             document.getElementById('feedback-message').innerText = msg;
         }
