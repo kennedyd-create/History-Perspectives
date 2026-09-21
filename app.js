@@ -88,8 +88,10 @@
         }
 
         function updateXPDisplay() {
-            document.getElementById('xp-display').innerText = xp;
-            document.getElementById('level-display').innerText = getLevel(xp);
+            const xpEl = document.getElementById('xp-display');
+            const levelEl = document.getElementById('level-display');
+            if (xpEl) xpEl.innerText = xp;
+            if (levelEl) levelEl.innerText = getLevel(xp);
         }
 
         function addXP(amount) {
@@ -103,8 +105,10 @@
 
             if (newLevel > oldLevel) {
                 const container = document.getElementById('xp-container');
-                container.classList.add('level-up');
-                setTimeout(() => container.classList.remove('level-up'), 1000);
+                if (container) {
+                    container.classList.add('level-up');
+                    setTimeout(() => container.classList.remove('level-up'), 1000);
+                }
             }
         }
 
@@ -332,7 +336,7 @@
             
             var viewId = target.getAttribute('data-target');
             
-            ['standard', 'sources', 'perspectives', 'vault', 'blueprint', 'practice', 'feedback', 'exemplars', 'wellbeing'].forEach(function(v) {
+            ['standard', 'sources', 'perspectives', 'toolkit', 'practice', 'exemplars', 'wellbeing'].forEach(function(v) {
                 var el = document.getElementById('view-' + v);
                 var btn = document.querySelector('[data-target="' + v + '"]');
                 if (el) { el.classList.remove('block'); el.classList.add('hidden'); }
@@ -392,22 +396,36 @@
         }
 
         function setPracticeMode(mode) {
+            const wBtn = document.getElementById('toggle-write');
             const qBtn = document.getElementById('toggle-quiz');
             const fBtn = document.getElementById('toggle-flash');
+            const wCon = document.getElementById('write-mode-container');
+            const qfWrapper = document.getElementById('qf-mode-wrapper');
             const qCon = document.getElementById('quiz-mode-container');
             const fCon = document.getElementById('flash-mode-container');
 
-            if(mode === 'quiz') {
-                qBtn.className = "px-6 py-2 rounded-md font-bold text-sm bg-white dark:bg-slate-900 text-whs-dark dark:text-blue-400 shadow-sm transition";
-                fBtn.className = "px-6 py-2 rounded-md font-bold text-sm text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition";
-                qCon.classList.remove('hidden'); qCon.classList.add('block');
-                fCon.classList.add('hidden'); fCon.classList.remove('block');
+            const activeClass = "px-7 py-3 rounded-md font-bold text-base bg-whs-gold text-white shadow-md scale-105 transition";
+            const inactiveClass = "px-7 py-3 rounded-md font-bold text-base text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition";
+
+            if (wBtn) wBtn.className = mode === 'write' ? activeClass : inactiveClass;
+            if (qBtn) qBtn.className = mode === 'quiz' ? activeClass : inactiveClass;
+            if (fBtn) fBtn.className = mode === 'flash' ? activeClass : inactiveClass;
+
+            if (mode === 'write') {
+                if (wCon) { wCon.classList.remove('hidden'); wCon.classList.add('block'); }
+                if (qfWrapper) qfWrapper.classList.add('hidden');
             } else {
-                fBtn.className = "px-6 py-2 rounded-md font-bold text-sm bg-white dark:bg-slate-900 text-whs-dark dark:text-blue-400 shadow-sm transition";
-                qBtn.className = "px-6 py-2 rounded-md font-bold text-sm text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition";
-                fCon.classList.remove('hidden'); fCon.classList.add('block');
-                qCon.classList.add('hidden'); qCon.classList.remove('block');
-                initFlashcards();
+                if (wCon) { wCon.classList.add('hidden'); wCon.classList.remove('block'); }
+                if (qfWrapper) qfWrapper.classList.remove('hidden');
+                if (mode === 'quiz') {
+                    if (qCon) { qCon.classList.remove('hidden'); qCon.classList.add('block'); }
+                    if (fCon) { fCon.classList.add('hidden'); fCon.classList.remove('block'); }
+                    setTimeout(initQuizChart, 50); // canvas was hidden until now; redraw at correct size
+                } else {
+                    if (fCon) { fCon.classList.remove('hidden'); fCon.classList.add('block'); }
+                    if (qCon) { qCon.classList.add('hidden'); qCon.classList.remove('block'); }
+                    initFlashcards();
+                }
             }
         }
 
@@ -530,7 +548,7 @@
                 addXP(50); // Reward max score
             }
             else if (quizScore >= 3) message = "Good job! You have a solid grasp of the facts, but review the Vault one more time to lock in the details.";
-            else message = "Keep practicing! Specific evidence is required to pass. Study the Evidence Vault tab and try again.";
+            else message = "Keep practising! Specific evidence is required to pass. Study the Evidence Vault tab and try again.";
             
             document.getElementById('results-message').innerText = message;
             
@@ -616,14 +634,14 @@
             safeStorage.set('whs_onboarded', 'true');
         }
 
-        // --- Blueprint sub-nav ---
-        function switchBlueprintPanel(key, btnElement) {
+        // --- Vault & Blueprint sub-nav (4 panels: timeline, evidence, context, planners) ---
+        function switchToolkitPanel(key, btnElement) {
             document.querySelectorAll('.blueprint-panel').forEach(panel => panel.classList.add('hidden'));
-            document.querySelectorAll('#bp-tab-context, #bp-tab-planners').forEach(btn => {
+            document.querySelectorAll('#toolkit-tab-timeline, #toolkit-tab-evidence, #toolkit-tab-context, #toolkit-tab-planners').forEach(btn => {
                 btn.classList.remove('active');
                 btn.setAttribute('aria-selected', 'false');
             });
-            const panel = document.getElementById('bp-panel-' + key);
+            const panel = document.getElementById('toolkit-panel-' + key);
             if (panel) panel.classList.remove('hidden');
             if (btnElement) {
                 btnElement.classList.add('active');
@@ -808,9 +826,9 @@
             } else if (!checks.secondPerspectiveIncluded) {
                 msg = "You've explored one perspective. To move beyond Achieved, bring in a second perspective (the US Administration or Emperor Hirohito) so there's something to compare it to.";
             } else if (!checks.explicitComparison) {
-                msg = "You have described two perspectives, but this is currently Achieved-level. To move toward Merit, explicitly compare them — try words like 'whereas', 'in contrast', or 'unlike'.";
+                msg = "You have described two perspectives, but this is currently Achieved-level. To move towards Merit, explicitly compare them — try words like 'whereas', 'in contrast', or 'unlike'.";
             } else if (!checks.explainedWhyDiffered) {
-                msg = "Good evidence, but you have not yet explained WHY the two perspectives differed. Add a sentence like 'This shows they differed because...' to push toward Excellence.";
+                msg = "Good evidence, but you have not yet explained WHY the two perspectives differed. Add a sentence like 'This shows they differed because...' to push towards Excellence.";
             } else if (!checks.widerContextUsed) {
                 msg = "Strong comparison! To reach Excellence, connect this to the Wider Context (e.g. the Cold War, the Soviet invasion, or the Meiji-era military tradition).";
                 if(!hasAwardedWritingXP) { addXP(70); hasAwardedWritingXP = true; }

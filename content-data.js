@@ -28,7 +28,7 @@ const masterQuizData = [
             { cat: 'factual', q: "What nickname was given to General MacArthur by the Japanese public?", opts: ["The Iron Commander", "The Gentle Conqueror", "The Emperor's Voice", "The Great Rebuilder"], ans: 1, exp: "Correct! Because of his focus on rebuilding, he was called the 'Gentle Conqueror'." },
             { cat: 'factual', q: "What was the upper estimate of American casualties President Truman was trying to avoid with Operation Downfall?", opts: ["50,000+", "100,000+", "132,000+", "1 Million+"], ans: 3, exp: "Correct! Military planners estimated up to 1 Million+ casualties if a land invasion occurred." },
             { cat: 'factual', q: "When did Emperor Hirohito deliver the Jewel Voice Broadcast?", opts: ["July 26, 1945", "August 6, 1945", "August 8, 1945", "August 15, 1945"], ans: 3, exp: "Correct! He announced the surrender on August 15, 1945." },
-            { cat: 'factual', q: "What caused a stalemate in the Japanese leadership council?", opts: ["A 3-3 split in the 'Big Six'", "Loss of communication", "Assassination of leaders", "American blockades"], ans: 0, exp: "Correct! A 3-3 split in the 'Big Six' paralyzed the government, forcing the Emperor to intervene." },
+            { cat: 'factual', q: "What caused a stalemate in the Japanese leadership council?", opts: ["A 3-3 split in the 'Big Six'", "Loss of communication", "Assassination of leaders", "American blockades"], ans: 0, exp: "Correct! A 3-3 split in the 'Big Six' paralysed the government, forcing the Emperor to intervene." },
             { cat: 'factual', q: "Who drafted the 'Byrnes Note' on August 11?", opts: ["Henry Stimson", "Harry Truman", "James F. Byrnes", "Douglas MacArthur"], ans: 2, exp: "Correct! US Secretary of State James F. Byrnes drafted the note keeping the Emperor's authority subject to the Supreme Commander." },
             { cat: 'factual', q: "Which US Secretary of War advocated for allowing Japan to keep the Emperor?", opts: ["Franklin D. Roosevelt", "Harry S. Truman", "Henry L. Stimson", "James F. Byrnes"], ans: 2, exp: "Correct! Henry L. Stimson believed it was the only way to secure a prompt and orderly surrender." },
             { cat: 'factual', q: "What wider historical context was Truman preparing for by rebuilding Japan?", opts: ["World War I", "The Vietnam War", "The Cold War", "The Korean War"], ans: 2, exp: "Correct! The US wanted Japan to be a strong capitalist shield in the upcoming Cold War against the Soviet Union." },
@@ -63,10 +63,10 @@ const flashcardData = [
             { front: "August 8-9, 1945", back: "Soviet Union declares war on Japan and invades Manchuria." },
             { front: "August 9-10, 1945", back: "Emperor Hirohito intervenes in deadlocked midnight meeting." },
             { front: "August 15, 1945", back: "Emperor Hirohito delivers the Jewel Voice Broadcast." },
-            { front: "Emperor Hirohito", back: "Stepped in to break a 3-3 deadlock, prioritizing the survival of the Japanese nation." },
+            { front: "Emperor Hirohito", back: "Stepped in to break a 3-3 deadlock, prioritising the survival of the Japanese nation." },
             { front: "Henry L. Stimson", back: "US Secretary of War. Advocated allowing Japan to keep the Emperor." },
             { front: "James F. Byrnes", back: "US Secretary of State. Drafted the 'Byrnes Note'." },
-            { front: "The 'Big Six'", back: "Japan's Supreme War Council, paralyzed by a 3-3 split." },
+            { front: "The 'Big Six'", back: "Japan's Supreme War Council, paralysed by a 3-3 split." },
             { front: "Gen. Korechika Anami", back: "Japanese Minister of War. Hardliner pushing for Ketsu-Gō (mainland battle)." },
             { front: "Kantaro Suzuki", back: "Japanese PM who asked Emperor to break the 3-3 deadlock." },
             { front: "1 Million+", back: "Upper estimate of US casualties for land invasion (Operation Downfall)." },
@@ -91,11 +91,11 @@ const vaultKeywords = {
 
 const errorChecks = [
             { regex: /atomic bomb(s)? on tokyo/i, warning: "Error: The atomic bombs were dropped on Hiroshima and Nagasaki, not Tokyo (which was firebombed earlier)." },
-            { regex: /hirohito dropped/i, warning: "Error: Emperor Hirohito did not drop the bomb; US President Truman authorized it." },
-            { regex: /macarthur dropped/i, warning: "Error: General MacArthur was the Supreme Commander of the occupation, but Truman authorized the atomic bombs." },
+            { regex: /hirohito dropped/i, warning: "Error: Emperor Hirohito did not drop the bomb; US President Truman authorised it." },
+            { regex: /macarthur dropped/i, warning: "Error: General MacArthur was the Supreme Commander of the occupation, but Truman authorised the atomic bombs." },
             { regex: /hirohito wanted to continue|hirohito wanted to fight/i, warning: "Error: Hirohito broke the deadlock to SURRENDER. It was military hardliners like Anami who wanted to continue the war." },
             { regex: /soviet(s)? dropped|russia(ns)? dropped/i, warning: "Error: The Soviet Union declared war and invaded Manchuria, but the US dropped the atomic bombs." },
-            { regex: /fdr dropped|roosevelt dropped/i, warning: "Error: FDR died in April 1945. Truman authorized the bombs." },
+            { regex: /fdr dropped|roosevelt dropped/i, warning: "Error: FDR died in April 1945. Truman authorised the bombs." },
             { regex: /august 6(.{1,15})nagasaki/i, warning: "Error: Hiroshima was bombed on August 6; Nagasaki was bombed on August 9." },
             { regex: /august 9(.{1,15})hiroshima/i, warning: "Error: Hiroshima was bombed on August 6; Nagasaki was bombed on August 9." }
         ];
