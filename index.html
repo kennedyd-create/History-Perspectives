@@ -94,6 +94,26 @@
            brand palette so they feel designed-in rather than dropped-in. */
         .archival-photo { filter: sepia(22%) saturate(85%) contrast(1.03); border-color: #c5a059 !important; }
         .dark .archival-photo { filter: sepia(15%) saturate(75%) brightness(0.92) contrast(1.05); }
+
+        /* Nav group divider: thin vertical line splitting the tab row into clusters */
+        .nav-divider { width: 1px; align-self: stretch; margin: 0.25rem 0.25rem; background-color: rgba(100, 116, 139, 0.3); flex-shrink: 0; }
+        .dark .nav-divider { background-color: rgba(148, 163, 184, 0.25); }
+
+        /* Perspectives sub-nav */
+        .perspective-tab-btn { padding: 0.5rem 1.25rem; border-radius: 9999px; font-size: 0.875rem; font-weight: 700; border: 2px solid transparent; background-color: #f1f5f9; color: #475569; transition: all 0.2s; }
+        .dark .perspective-tab-btn { background-color: #1e293b; color: #94a3b8; }
+        .perspective-tab-btn:hover { background-color: #e2e8f0; }
+        .dark .perspective-tab-btn:hover { background-color: #334155; }
+        .perspective-tab-btn.active { background-color: var(--whs-gold); border-color: #a88647; color: white; }
+        .perspective-panel.hidden { display: none; }
+        .blueprint-panel.hidden { display: none; }
+
+        /* Quiz filter/length pills */
+        .quiz-filter-btn, .quiz-length-btn { padding: 0.35rem 0.85rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; border: 2px solid transparent; background-color: #f1f5f9; color: #475569; transition: all 0.2s; }
+        .dark .quiz-filter-btn, .dark .quiz-length-btn { background-color: #1e293b; color: #94a3b8; }
+        .quiz-filter-btn:hover, .quiz-length-btn:hover { background-color: #e2e8f0; }
+        .dark .quiz-filter-btn:hover, .dark .quiz-length-btn:hover { background-color: #334155; }
+        .quiz-filter-btn.active, .quiz-length-btn.active { background-color: #10b981; border-color: #059669; color: white; }
         .dark .quiz-option { border-color: #334155; }
         .dark .quiz-option:hover { background-color: #1e293b; border-color: #475569; }
         .dark .quiz-option.correct { background-color: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #34d399; }
@@ -114,6 +134,17 @@
                 transition-duration: 0.001ms !important;
                 scroll-behavior: auto !important;
             }
+        }
+
+        /* Print: hide interactive/navigational chrome, flatten to black-on-white for a clean worksheet */
+        @media print {
+            nav, [role="tablist"], button, .fixed, #timeline-buttons, #todo-input, #onboarding-tip { display: none !important; }
+            nav.sticky { display: none !important; }
+            * { background: white !important; color: black !important; box-shadow: none !important; text-shadow: none !important; }
+            .glass-card, [class*="border"], [class*="rounded"] { border: 1px solid #ccc !important; }
+            img { filter: grayscale(100%) !important; max-width: 100% !important; }
+            body { padding: 0 !important; margin: 0 !important; }
+            a[href]::after { content: " (" attr(href) ")"; font-size: 0.75em; font-weight: normal; }
         }
     </style>
 </head>
@@ -147,7 +178,7 @@
                 <div class="flex-1">
                     <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-1">Waiheke High School</h1>
                     <h2 class="text-lg md:text-xl font-normal text-blue-200">NCEA Level 1 History (AS92027) Dashboard</h2>
-                    <div class="mt-2 inline-block bg-white text-whs-dark px-3 py-1 border border-transparent text-[10px] md:text-xs font-bold uppercase tracking-widest shadow-sm rounded">The Occupation of Japan</div>
+                    <div class="mt-2 inline-block bg-white text-whs-dark px-3 py-1 border border-transparent text-[10px] md:text-xs font-bold uppercase tracking-widest shadow-sm rounded">The Surrender of Japan</div>
                     <div class="mt-2 text-[10px] text-blue-300 font-medium tracking-wide">Last updated 23 Aug 2026</div>
                 </div>
             </div>
@@ -187,6 +218,16 @@
             <svg aria-hidden="true" focusable="false" class="absolute right-0 top-0 h-full w-64 text-white/5 transform translate-x-1/4 -translate-y-1/4 scale-150 pointer-events-none" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v4h-2zm0 6h2v2h-2zm-4-6h2v4H7zm0 6h2v2H7zm8-6h2v4h-2zm0 6h2v2h-2z" opacity="0.5"/><circle cx="12" cy="12" r="3" /><path d="M12 7l-3 4h6zM7 12l4 3v-6zM17 12l-4-3v6zM12 17l3-4H9z" opacity="0.8"/></svg>
         </header>
 
+        <!-- FIRST-VISIT ONBOARDING TIP -->
+        <div id="onboarding-tip" class="hidden mb-6 bg-whs-gold/10 dark:bg-slate-800 border-2 border-whs-gold rounded-xl p-4 flex items-start gap-3">
+            <span class="text-2xl shrink-0" aria-hidden="true">👋</span>
+            <div class="flex-1 text-sm text-slate-700 dark:text-slate-300 font-medium leading-relaxed">
+                <strong class="text-whs-goldtext dark:text-whs-gold block mb-1">Quick orientation</strong>
+                Tabs above are grouped: <strong>Learn</strong> (Standard → Blueprint), <strong>Practise</strong> (Sandbox → Practice Hub), then Wellbeing on its own. Perspectives and Blueprint have their own mini-tabs at the top of the page. The 🎓 Master Tutor and ⬆ back-to-top buttons float in the bottom corners on every page.
+            </div>
+            <button onclick="dismissOnboardingTip()" aria-label="Dismiss this tip" class="shrink-0 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-black text-lg leading-none px-1">✕</button>
+        </div>
+
         <!-- NAVIGATION -->
         <nav role="tablist" aria-label="Dashboard sections" class="sticky top-0 z-50 bg-slate-100/95 dark:bg-slate-900/95 backdrop-blur-md flex items-center justify-start md:justify-center border-b-2 border-slate-300 dark:border-slate-700 mb-8 gap-1 md:gap-4 overflow-x-auto pb-3 pt-3 -mx-4 px-4 md:-mx-0 md:px-0 shadow-sm transition-all duration-300 custom-scrollbar">
             <button id="tab-standard" role="tab" aria-selected="true" aria-controls="view-standard" class="nav-btn nav-active text-slate-600 dark:text-slate-400" data-action="view" data-target="standard">The Standard</button>
@@ -194,9 +235,11 @@
             <button id="tab-sources" role="tab" aria-selected="false" aria-controls="view-sources" class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="sources">Primary Sources</button>
             <button id="tab-vault" role="tab" aria-selected="false" aria-controls="view-vault" class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="vault">Evidence Vault</button>
             <button id="tab-blueprint" role="tab" aria-selected="false" aria-controls="view-blueprint" class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="blueprint">Blueprint</button>
+            <span class="nav-divider" aria-hidden="true"></span>
             <button id="tab-feedback" role="tab" aria-selected="false" aria-controls="view-feedback" class="nav-btn text-whs-goldtext font-bold" data-action="view" data-target="feedback">Sandbox</button>
             <button id="tab-exemplars" role="tab" aria-selected="false" aria-controls="view-exemplars" class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="exemplars">Exemplars</button>
             <button id="tab-practice" role="tab" aria-selected="false" aria-controls="view-practice" class="nav-btn text-slate-600 dark:text-slate-400" data-action="view" data-target="practice">Practice Hub</button>
+            <span class="nav-divider" aria-hidden="true"></span>
             <button id="tab-wellbeing" role="tab" aria-selected="false" aria-controls="view-wellbeing" class="nav-btn text-rose-600 dark:text-rose-400 font-bold" data-action="view" data-target="wellbeing">💚 Wellbeing</button>
         </nav>
 
@@ -279,6 +322,15 @@
                     <p class="text-slate-600 dark:text-slate-400">Compare the core values, beliefs, and motivations of the two sides.</p>
                 </div>
 
+                <!-- Perspectives sub-nav -->
+                <div role="tablist" aria-label="Perspectives sections" class="flex flex-wrap justify-center gap-2 mb-8">
+                    <button id="persp-tab-overview" role="tab" aria-selected="true" aria-controls="persp-panel-overview" class="perspective-tab-btn active" onclick="switchPerspectivePanel('overview', this)">Overview</button>
+                    <button id="persp-tab-compare" role="tab" aria-selected="false" aria-controls="persp-panel-compare" class="perspective-tab-btn" onclick="switchPerspectivePanel('compare', this)">Compare</button>
+                    <button id="persp-tab-write" role="tab" aria-selected="false" aria-controls="persp-panel-write" class="perspective-tab-btn" onclick="switchPerspectivePanel('write', this)">How to Write</button>
+                </div>
+
+                <!-- SUB-PANEL: Overview -->
+                <div id="persp-panel-overview" class="perspective-panel">
                 <!-- Hero photo: the two perspectives, face to face -->
                 <figure class="max-w-3xl mx-auto mb-8">
                     <img src="https://cdn2.picryl.com/photo/1945/09/27/macarthur-hirohito2-03d8e8-1024.jpg" alt="General Douglas MacArthur standing beside Emperor Hirohito at their first meeting, US Embassy, Tokyo, 27 September 1945" class="archival-photo mx-auto rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 object-contain max-h-96 bg-slate-100 dark:bg-slate-900">
@@ -373,7 +425,10 @@
                         </div>
                     </div>
                 </div>
+                </div>
 
+                <!-- SUB-PANEL: Compare -->
+                <div id="persp-panel-compare" class="perspective-panel hidden">
                 <!-- COMPARE THE PERSPECTIVES -->
                 <div class="glass-card p-6 md:p-8 border-t-4 border-t-whs-gold max-w-5xl mx-auto mb-8 bg-white dark:bg-slate-800 rounded-xl">
                     <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-1 text-center">Compare the Perspectives</h3>
@@ -381,45 +436,46 @@
 
                     <div class="overflow-x-auto -mx-2 px-2">
                         <table class="w-full text-sm border-collapse min-w-[640px]">
+                            <caption class="sr-only">A comparison of the US Administration and Emperor Hirohito across core belief, motivation, fear, desired outcome, actions taken, why their actions differed, and similarities.</caption>
                             <thead>
                                 <tr>
-                                    <th class="text-left p-3 bg-slate-100 dark:bg-slate-900 rounded-tl-lg font-bold text-slate-600 dark:text-slate-400 uppercase text-xs tracking-wider w-1/5">Comparison</th>
-                                    <th class="text-left p-3 bg-whs-dark dark:bg-blue-900 text-white font-bold text-xs uppercase tracking-wider w-2/5">🇺🇸 US Administration</th>
-                                    <th class="text-left p-3 bg-[#8b0000] dark:bg-red-900 text-white rounded-tr-lg font-bold text-xs uppercase tracking-wider w-2/5">🇯🇵 Emperor Hirohito</th>
+                                    <th scope="col" class="text-left p-3 bg-slate-100 dark:bg-slate-900 rounded-tl-lg font-bold text-slate-600 dark:text-slate-400 uppercase text-xs tracking-wider w-1/5">Comparison</th>
+                                    <th scope="col" class="text-left p-3 bg-whs-dark dark:bg-blue-900 text-white font-bold text-xs uppercase tracking-wider w-2/5">🇺🇸 US Administration</th>
+                                    <th scope="col" class="text-left p-3 bg-[#8b0000] dark:bg-red-900 text-white rounded-tr-lg font-bold text-xs uppercase tracking-wider w-2/5">🇯🇵 Emperor Hirohito</th>
                                 </tr>
                             </thead>
                             <tbody class="align-top">
                                 <tr class="border-b border-slate-100 dark:border-slate-700">
-                                    <td class="p-3 font-bold text-slate-700 dark:text-slate-300">Core belief</td>
+                                    <th scope="row" class="text-left p-3 font-bold text-slate-700 dark:text-slate-300">Core belief</th>
                                     <td class="p-3 text-slate-700 dark:text-slate-300 font-medium">Democracy, security, and the elimination of militarism.</td>
                                     <td class="p-3 text-slate-700 dark:text-slate-300 font-medium">Preservation of <em>Kokutai</em> and the Imperial system.</td>
                                 </tr>
                                 <tr class="border-b border-slate-100 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/40">
-                                    <td class="p-3 font-bold text-slate-700 dark:text-slate-300">Primary motivation</td>
+                                    <th scope="row" class="text-left p-3 font-bold text-slate-700 dark:text-slate-300">Primary motivation</th>
                                     <td class="p-3 text-slate-700 dark:text-slate-300 font-medium">End the war quickly and secure unconditional surrender.</td>
                                     <td class="p-3 text-slate-700 dark:text-slate-300 font-medium">Prevent national destruction and preserve the Emperor.</td>
                                 </tr>
                                 <tr class="border-b border-slate-100 dark:border-slate-700">
-                                    <td class="p-3 font-bold text-slate-700 dark:text-slate-300">Main fear / concern</td>
+                                    <th scope="row" class="text-left p-3 font-bold text-slate-700 dark:text-slate-300">Main fear / concern</th>
                                     <td class="p-3 text-slate-700 dark:text-slate-300 font-medium">A costly invasion (Operation Downfall) and continued resistance.</td>
                                     <td class="p-3 text-slate-700 dark:text-slate-300 font-medium">Total destruction of Japan and loss of the Imperial institution.</td>
                                 </tr>
                                 <tr class="border-b border-slate-100 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/40">
-                                    <td class="p-3 font-bold text-slate-700 dark:text-slate-300">Desired outcome</td>
+                                    <th scope="row" class="text-left p-3 font-bold text-slate-700 dark:text-slate-300">Desired outcome</th>
                                     <td class="p-3 text-slate-700 dark:text-slate-300 font-medium">Unconditional surrender.</td>
                                     <td class="p-3 text-slate-700 dark:text-slate-300 font-medium">A surrender that protected the Emperor.</td>
                                 </tr>
                                 <tr class="border-b border-slate-100 dark:border-slate-700">
-                                    <td class="p-3 font-bold text-slate-700 dark:text-slate-300">Actions taken</td>
+                                    <th scope="row" class="text-left p-3 font-bold text-slate-700 dark:text-slate-300">Actions taken</th>
                                     <td class="p-3 text-slate-700 dark:text-slate-300 font-medium">Potsdam Declaration, atomic bombs, the Byrnes Note.</td>
                                     <td class="p-3 text-slate-700 dark:text-slate-300 font-medium">Delayed surrender, Imperial intervention, the Jewel Voice Broadcast.</td>
                                 </tr>
                                 <tr class="border-b border-slate-100 dark:border-slate-700 bg-slate-50/60 dark:bg-slate-900/40">
-                                    <td class="p-3 font-bold text-slate-700 dark:text-slate-300">Why their actions differed</td>
+                                    <th scope="row" class="text-left p-3 font-bold text-slate-700 dark:text-slate-300">Why their actions differed</th>
                                     <td colspan="2" class="p-3 text-slate-700 dark:text-slate-300 font-medium">The US treated victory over militarism as the condition for safety, so it acted decisively and externally (weapons, declarations). Hirohito treated the survival of the Imperial system as the condition for Japan's survival, so he acted internally — intervening in his own government rather than the war itself.</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-3 font-bold text-slate-700 dark:text-slate-300 rounded-bl-lg">Similarities</td>
+                                    <th scope="row" class="text-left p-3 font-bold text-slate-700 dark:text-slate-300 rounded-bl-lg">Similarities</th>
                                     <td colspan="2" class="p-3 text-slate-700 dark:text-slate-300 font-medium rounded-br-lg">Both ultimately wanted the war to end. Both were driven by fear of destruction (of US soldiers' lives; of Japan itself). Both used strategic ambiguity to protect what mattered most to them — the US with the deliberately vague Byrnes Note, Hirohito by intervening quietly rather than publicly challenging the military.</td>
                                 </tr>
                             </tbody>
@@ -431,7 +487,10 @@
                         <p class="text-slate-800 dark:text-slate-200 text-sm font-medium leading-relaxed">Both sides eventually wanted the war to end, but they differed fundamentally in what they believed needed to be protected. The US prioritised military victory, security and political reconstruction, while Hirohito prioritised the survival of Japan and the Imperial system.</p>
                     </div>
                 </div>
+                </div>
 
+                <!-- SUB-PANEL: How to Write -->
+                <div id="persp-panel-write" class="perspective-panel hidden">
                 <!-- HOW TO COMPARE: WHAT → WHY → ACTION → COMPARE -->
                 <div class="glass-card p-6 md:p-8 border-t-4 border-t-whs-gold max-w-5xl mx-auto mb-8 bg-white dark:bg-slate-800 rounded-xl">
                     <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-1 text-center">How to Write a Comparison</h3>
@@ -468,6 +527,7 @@
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
 
             <!-- VIEW 2.5: PRIMARY SOURCES -->
@@ -503,6 +563,31 @@
                             <p>"Moreover, the enemy has begun to employ a new and most cruel bomb, the power of which to do damage is, indeed, incalculable, taking the toll of many innocent lives. Should we continue to fight, not only would it result in an ultimate collapse and obliteration of the Japanese nation, but also it would lead to the total extinction of human civilization."</p>
                             <p>"We have resolved to pave the way for a grand peace for all the generations to come by <strong>enduring the unendurable and suffering what is insufferable.</strong>"</p>
                         </div>
+                    </div>
+
+                    <!-- Source Comparison -->
+                    <div class="bg-whs-gold/10 dark:bg-slate-900 border-2 border-whs-gold rounded-xl p-6">
+                        <h3 class="text-lg font-black text-whs-goldtext dark:text-whs-gold mb-3">Compare These Sources</h3>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 font-medium mb-4">These two sources are a natural pair for a comparison answer — one written by the US, one by Japan, both about the same event.</p>
+                        <div class="grid md:grid-cols-2 gap-4 text-sm">
+                            <div class="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                                <span class="font-bold text-whs-dark dark:text-blue-400 block mb-1">Tone</span>
+                                <span class="text-slate-700 dark:text-slate-300 font-medium">Potsdam is threatening and demands unconditional terms ("prompt and utter destruction").</span>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                                <span class="font-bold text-[#8b0000] dark:text-red-400 block mb-1">Tone</span>
+                                <span class="text-slate-700 dark:text-slate-300 font-medium">The Jewel Voice Broadcast is sorrowful and frames surrender as a painful sacrifice ("enduring the unendurable").</span>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                                <span class="font-bold text-whs-dark dark:text-blue-400 block mb-1">Audience</span>
+                                <span class="text-slate-700 dark:text-slate-300 font-medium">Addressed to Japan's government and military leadership — a formal ultimatum between states.</span>
+                            </div>
+                            <div class="bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                                <span class="font-bold text-[#8b0000] dark:text-red-400 block mb-1">Audience</span>
+                                <span class="text-slate-700 dark:text-slate-300 font-medium">Addressed directly to the Japanese public — many hearing the Emperor's voice for the first time.</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-slate-700 dark:text-slate-300 font-medium mt-4 bg-white dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700"><strong>Try this:</strong> "Whereas the Potsdam Declaration threatens Japan with 'prompt and utter destruction,' Hirohito's broadcast frames the same threat as 'enduring the unendurable' — showing how the same crisis was presented as a demand by the US and as a sacrifice by Japan."</p>
                     </div>
                 </div>
             </div>
@@ -619,6 +704,10 @@
                                     <p class="text-slate-600 dark:text-slate-400 italic text-sm font-medium">— President Truman, warning Japan on August 6.</p>
                                 </div>
                             </div>
+                            <div class="mt-4 bg-whs-gold/10 dark:bg-slate-900 border border-whs-gold rounded-lg p-3">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-whs-goldtext dark:text-whs-gold block mb-1">Pair these quotes</span>
+                                <p class="text-xs text-slate-700 dark:text-slate-300 font-medium">Truman's <em>"rain of ruin"</em> and Hirohito's <em>"enduring the unendurable"</em> both describe the same destruction — one as a threat, one as a burden. Quoting both in the same sentence is an easy way to show comparison.</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -631,6 +720,14 @@
                     <p class="text-slate-600 dark:text-slate-400">How to structure your essay and include the Wider Context to get an 'E'.</p>
                 </div>
 
+                <!-- Blueprint sub-nav -->
+                <div role="tablist" aria-label="Blueprint sections" class="flex flex-wrap justify-center gap-2 mb-8">
+                    <button id="bp-tab-context" role="tab" aria-selected="true" aria-controls="bp-panel-context" class="perspective-tab-btn active" onclick="switchBlueprintPanel('context', this)">Wider Context</button>
+                    <button id="bp-tab-planners" role="tab" aria-selected="false" aria-controls="bp-panel-planners" class="perspective-tab-btn" onclick="switchBlueprintPanel('planners', this)">Paragraph Planners</button>
+                </div>
+
+                <!-- SUB-PANEL: Wider Context -->
+                <div id="bp-panel-context" class="blueprint-panel">
                 <!-- Wider Context Callout w/ Tooltips -->
                 <div class="bg-gradient-to-br from-whs-dark to-blue-900 text-white p-8 rounded-2xl shadow-lg mb-8 max-w-5xl mx-auto relative overflow-hidden">
                     <div class="relative z-10">
@@ -658,7 +755,10 @@
                         </div>
                     </div>
                 </div>
+                </div>
 
+                <!-- SUB-PANEL: Paragraph Planners -->
+                <div id="bp-panel-planners" class="blueprint-panel hidden">
                 <div class="glass-card p-8 border-t-4 border-t-whs-dark max-w-5xl mx-auto bg-white dark:bg-slate-800 rounded-xl">
                     <h3 class="text-2xl font-bold text-slate-800 dark:text-white mb-1 border-b border-slate-200 dark:border-slate-700 pb-3">Paragraph Planners</h3>
                     <p class="text-sm text-slate-500 dark:text-slate-400 mt-3 mb-2">Each paragraph now ends with a <strong>Comparison</strong> sentence — don't skip it. A paragraph that only describes one perspective caps out well below Excellence.</p>
@@ -752,6 +852,7 @@
                         </div>
                     </div>
                 </div>
+                </div>
             </div>
 
             <!-- VIEW 5: WRITING SANDBOX -->
@@ -837,7 +938,7 @@
                                 <div class="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-3 relative overflow-hidden">
                                     <div class="bg-[#10b981] h-3 rounded-full transition-all duration-500" id="strength-bar" style="width: 0%"></div>
                                 </div>
-                                <p class="text-right text-xs font-bold mt-1 text-slate-600 dark:text-slate-400" id="strength-text">0%</p>
+                                <p class="text-right text-xs font-bold mt-1 text-slate-600 dark:text-slate-400" id="strength-text" aria-live="polite">0%</p>
                             </div>
 
                             <div class="mb-6">
@@ -870,7 +971,7 @@
                                 </div>
                             </div>
 
-                            <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-whs-dark dark:text-blue-200 font-medium" id="feedback-message">
+                            <div class="mt-6 p-4 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 rounded-lg text-sm text-whs-dark dark:text-blue-200 font-medium" id="feedback-message" role="status" aria-live="polite">
                                 Write at least 50 words and include specific evidence to get feedback.
                             </div>
                         </div>
@@ -955,6 +1056,52 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Exemplar ladder for Sandbox Questions 5 & 6 -->
+                <div class="max-w-5xl mx-auto mt-10">
+                    <h3 class="text-2xl font-black text-slate-900 dark:text-white mb-1 text-center">Answering Questions 5 & 6</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm text-center mb-6">These two Sandbox questions ask you to explain <em>why</em> perspectives differed and how wider circumstances shaped them — here's what that looks like at each level.</p>
+
+                    <div class="glass-card bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 mb-4">
+                        <div class="bg-slate-100 dark:bg-slate-900 p-3 border-b border-slate-200 dark:border-slate-700">
+                            <h4 class="font-black text-slate-700 dark:text-slate-300 text-sm">Q5 — Why did the two perspectives differ?</h4>
+                        </div>
+                        <div class="divide-y divide-slate-100 dark:divide-slate-700">
+                            <div class="p-4 flex flex-col md:flex-row gap-3 md:items-start">
+                                <span class="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 w-24 shrink-0">Achieved</span>
+                                <p class="text-sm text-slate-800 dark:text-slate-200 font-medium">The perspectives differed because the US wanted unconditional surrender and Hirohito wanted to protect the Emperor.</p>
+                            </div>
+                            <div class="p-4 flex flex-col md:flex-row gap-3 md:items-start bg-blue-50/50 dark:bg-slate-900/40">
+                                <span class="text-xs font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 w-24 shrink-0">Merit</span>
+                                <p class="text-sm text-slate-800 dark:text-slate-200 font-medium">The perspectives differed because each side measured "security" differently: the US believed safety required the total defeat of militarism, while Hirohito believed Japan's survival depended on preserving the <em>Kokutai</em>.</p>
+                            </div>
+                            <div class="p-4 flex flex-col md:flex-row gap-3 md:items-start bg-whs-gold/10 dark:bg-slate-900">
+                                <span class="text-xs font-black uppercase tracking-widest text-whs-goldtext dark:text-whs-gold w-24 shrink-0">Excellence</span>
+                                <p class="text-sm text-slate-800 dark:text-slate-200 font-medium">The perspectives differed because each leader was responding to a different core threat: for Truman, the threat was continued militarism and the cost of invasion; for Hirohito, the threat was the total collapse of the Imperial system itself. This meant the US pursued security through overwhelming force, while Hirohito pursued survival through internal political sacrifice — two rational responses to the same crisis, shaped by what each side valued most.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card bg-white dark:bg-slate-800 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700">
+                        <div class="bg-slate-100 dark:bg-slate-900 p-3 border-b border-slate-200 dark:border-slate-700">
+                            <h4 class="font-black text-slate-700 dark:text-slate-300 text-sm">Q6 — How did wider historical circumstances help shape these different perspectives?</h4>
+                        </div>
+                        <div class="divide-y divide-slate-100 dark:divide-slate-700">
+                            <div class="p-4 flex flex-col md:flex-row gap-3 md:items-start">
+                                <span class="text-xs font-black uppercase tracking-widest text-slate-500 dark:text-slate-400 w-24 shrink-0">Achieved</span>
+                                <p class="text-sm text-slate-800 dark:text-slate-200 font-medium">The Soviet Union invaded Manchuria in August 1945, which affected Japan's decision to surrender.</p>
+                            </div>
+                            <div class="p-4 flex flex-col md:flex-row gap-3 md:items-start bg-blue-50/50 dark:bg-slate-900/40">
+                                <span class="text-xs font-black uppercase tracking-widest text-blue-600 dark:text-blue-400 w-24 shrink-0">Merit</span>
+                                <p class="text-sm text-slate-800 dark:text-slate-200 font-medium">The Soviet invasion of Manchuria removed Japan's last hope of a negotiated peace through Soviet mediation, while for the US it added pressure to end the war before Soviet influence grew in the Pacific — the same event pushed both sides toward surrender, but for different reasons.</p>
+                            </div>
+                            <div class="p-4 flex flex-col md:flex-row gap-3 md:items-start bg-whs-gold/10 dark:bg-slate-900">
+                                <span class="text-xs font-black uppercase tracking-widest text-whs-goldtext dark:text-whs-gold w-24 shrink-0">Excellence</span>
+                                <p class="text-sm text-slate-800 dark:text-slate-200 font-medium">Wider circumstances did not just add pressure — they reshaped what each side considered possible. For Japan, decades of Meiji-era tradition had kept Emperors out of politics; only the combined shock of atomic bombardment and Soviet invasion made Hirohito's direct intervention thinkable. For the US, the emerging Cold War meant the decision was never just about ending WWII — some historians argue it was also about shaping the post-war Pacific before Soviet influence could grow there. In both cases, circumstances beyond the immediate war set the boundaries within which each perspective operated.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- VIEW 8: PRACTICE HUB (QUIZ & FLASHCARDS) -->
@@ -977,9 +1124,22 @@
 
                         <!-- Quiz Container -->
                         <div id="quiz-mode-container" class="glass-card p-6 md:p-10 border-t-4 border-t-[#10b981] mx-auto shadow-sm bg-white dark:bg-slate-800 rounded-xl block">
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 pb-4 border-b border-slate-200 dark:border-slate-700">
+                                <div class="flex flex-wrap gap-1.5">
+                                    <button class="quiz-filter-btn active" onclick="setQuizCategory('all', this)">All Topics</button>
+                                    <button class="quiz-filter-btn" onclick="setQuizCategory('factual', this)">Factual Recall</button>
+                                    <button class="quiz-filter-btn" onclick="setQuizCategory('perspective', this)">Perspective Reasoning</button>
+                                    <button class="quiz-filter-btn" onclick="setQuizCategory('comparison', this)">Comparison</button>
+                                </div>
+                                <div class="flex gap-1.5">
+                                    <button class="quiz-length-btn active" onclick="setQuizLength(10, this)">10</button>
+                                    <button class="quiz-length-btn" onclick="setQuizLength(20, this)">20</button>
+                                    <button class="quiz-length-btn" onclick="setQuizLength('all', this)">All</button>
+                                </div>
+                            </div>
                             <div id="quiz-container">
                                 <div class="flex justify-between items-center mb-6 border-b border-slate-200 dark:border-slate-700 pb-4">
-                                    <span class="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400" id="quiz-progress">Question 1 of 5</span>
+                                    <span class="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400" id="quiz-progress">Question 1 of 10</span>
                                     <span class="text-sm font-bold bg-[#10b981] text-white px-3 py-1 rounded-full shadow-sm" id="quiz-score">Score: 0</span>
                                 </div>
                                 
@@ -1116,6 +1276,11 @@
                 <span class="block text-[10px] text-blue-200 font-medium">Opens in new tab ↗</span>
             </span>
         </a>
+
+        <!-- BACK TO TOP (fades in after scrolling; opposite corner from Master Tutor) -->
+        <button id="back-to-top" onclick="scrollToTop()" aria-label="Back to top" title="Back to top" class="fixed bottom-5 left-5 z-50 w-11 h-11 flex items-center justify-center rounded-full bg-whs-dark dark:bg-blue-950 border-2 border-whs-gold text-white shadow-xl opacity-0 pointer-events-none translate-y-2 transition-all duration-300 hover:-translate-y-0.5">
+            <svg aria-hidden="true" focusable="false" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"></path></svg>
+        </button>
     </div>
 
     <!-- App logic lives in content-data.js (edit content here) and app.js (edit behaviour here) -->

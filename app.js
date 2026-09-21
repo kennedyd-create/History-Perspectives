@@ -374,6 +374,22 @@
         let activeQuizPool = [];
         let currentQIndex = 0;
         let quizScore = 0;
+        let quizCategory = 'all';
+        let quizLength = 10;
+
+        function setQuizCategory(cat, btnElement) {
+            quizCategory = cat;
+            document.querySelectorAll('.quiz-filter-btn').forEach(btn => btn.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+            initQuiz();
+        }
+
+        function setQuizLength(len, btnElement) {
+            quizLength = len;
+            document.querySelectorAll('.quiz-length-btn').forEach(btn => btn.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+            initQuiz();
+        }
 
         function setPracticeMode(mode) {
             const qBtn = document.getElementById('toggle-quiz');
@@ -406,19 +422,28 @@
         }
 
         function initQuiz() {
-            const shuffledPool = shuffle([...masterQuizData]);
-            activeQuizPool = shuffledPool.slice(0, 5); 
+            let pool = masterQuizData;
+            if (quizCategory !== 'all') {
+                pool = pool.filter(q => q.cat === quizCategory);
+            }
+            const shuffledPool = shuffle([...pool]);
+            const count = quizLength === 'all' ? shuffledPool.length : Math.min(quizLength, shuffledPool.length);
+            activeQuizPool = shuffledPool.slice(0, count);
             
             currentQIndex = 0;
             quizScore = 0;
             document.getElementById('quiz-results').classList.add('hidden');
             document.getElementById('quiz-container').classList.remove('hidden');
+            if (activeQuizPool.length === 0) {
+                document.getElementById('quiz-container').classList.add('hidden');
+                return;
+            }
             loadQuestion();
         }
 
         function loadQuestion() {
             const q = activeQuizPool[currentQIndex];
-            document.getElementById('quiz-progress').innerText = `Question ${currentQIndex + 1} of 5`;
+            document.getElementById('quiz-progress').innerText = `Question ${currentQIndex + 1} of ${activeQuizPool.length}`;
             document.getElementById('quiz-score').innerText = `Score: ${quizScore}`;
             document.getElementById('quiz-question').innerText = q.q;
             document.getElementById('quiz-feedback-container').classList.add('hidden');
@@ -562,6 +587,67 @@
         }
 
 
+        // --- Perspectives sub-nav ---
+        function switchPerspectivePanel(key, btnElement) {
+            document.querySelectorAll('.perspective-panel').forEach(panel => panel.classList.add('hidden'));
+            document.querySelectorAll('.perspective-tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+            const panel = document.getElementById('persp-panel-' + key);
+            if (panel) panel.classList.remove('hidden');
+            if (btnElement) {
+                btnElement.classList.add('active');
+                btnElement.setAttribute('aria-selected', 'true');
+            }
+        }
+
+        // --- First-visit onboarding tip ---
+        function initOnboardingTip() {
+            const tip = document.getElementById('onboarding-tip');
+            if (!tip) return;
+            if (safeStorage.get('whs_onboarded') === 'true') return;
+            tip.classList.remove('hidden');
+        }
+
+        function dismissOnboardingTip() {
+            const tip = document.getElementById('onboarding-tip');
+            if (tip) tip.classList.add('hidden');
+            safeStorage.set('whs_onboarded', 'true');
+        }
+
+        // --- Blueprint sub-nav ---
+        function switchBlueprintPanel(key, btnElement) {
+            document.querySelectorAll('.blueprint-panel').forEach(panel => panel.classList.add('hidden'));
+            document.querySelectorAll('#bp-tab-context, #bp-tab-planners').forEach(btn => {
+                btn.classList.remove('active');
+                btn.setAttribute('aria-selected', 'false');
+            });
+            const panel = document.getElementById('bp-panel-' + key);
+            if (panel) panel.classList.remove('hidden');
+            if (btnElement) {
+                btnElement.classList.add('active');
+                btnElement.setAttribute('aria-selected', 'true');
+            }
+        }
+
+        // --- Back to Top ---
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function initBackToTop() {
+            const btn = document.getElementById('back-to-top');
+            if (!btn) return;
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 400) {
+                    btn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-2');
+                } else {
+                    btn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-2');
+                }
+            }, { passive: true });
+        }
+
         // Regex Error Checks for expanded NLP fact-checking
 
         const textArea = document.getElementById('sandbox-text');
@@ -573,6 +659,8 @@
             initCountdown();
             setInterval(initCountdown, 60 * 60 * 1000); // keep "days to go" accurate across long sessions
             initQuizChart();
+            initBackToTop();
+            initOnboardingTip();
 
             const savedDraft = safeStorage.get('whs_draft_essay');
             if (savedDraft) {
